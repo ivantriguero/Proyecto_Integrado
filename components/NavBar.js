@@ -1,7 +1,12 @@
 import Link from "next/link"
 import {FaLeaf} from "react-icons/fa"
 
-const NavBar = () => {
+const NavBar = ({showLogin, setShowLogin}) => {
+
+    const monstrarLogin=()=>{
+        setShowLogin(prev => !prev)
+    }
+
     return (
         <>
         <nav className="px-20 py-5 transparent flex fixed top-0 left-0 right-0 text-white justify-between">
@@ -12,7 +17,7 @@ const NavBar = () => {
                 <li className="px-3">ONGs</li>
                 <li className="px-3">Registrarse</li>
             </ul>
-            <Link href="/Login"><button className="bg-green-500 px-5 py-2 rounded-full hover:bg-green-600">Iniciar sesión</button></Link>
+            <button onClick={monstrarLogin} className="bg-green-500 px-5 py-2 rounded-full hover:bg-green-600">Iniciar sesión</button>
         </nav>
         </>
     )

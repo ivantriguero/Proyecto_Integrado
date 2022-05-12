@@ -11,7 +11,9 @@ import Cookies from 'js-cookie';
 import { motion } from "framer-motion"
 
 
-const Usuarios =({usuarios, rows}) => {
+const ONGS =({ongs, rows}) => {
+
+    console.log(rows)
     let token = Cookies.get('accessToken')
     if(token==undefined||token==null){
         token=''
@@ -31,7 +33,8 @@ const Usuarios =({usuarios, rows}) => {
         email : '',
         clave : '',
         nombre: '',
-        dni:'',
+        descripcion: '',
+        direccion:'',
         telefono:''
     });
     const handleChange = (e) =>{
@@ -50,18 +53,11 @@ const Usuarios =({usuarios, rows}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const {email, clave, nombre, dni, telefono}=formValue
-        const res = await axios.post('/api/usuarios', {
-            email:[email],
-            clave: [clave],
-            nombre: [nombre],
-            dni: [dni],
-            telefono: [telefono]
-        },config)
+        const res = await axios.post('/api/ongs', formValue, config)
         if(res.status==200){
             setMensaje(()=>{
                 return{
-                    mensaje: 'Usuario creado correctamente'
+                    mensaje: 'ONG creada correctamente'
                 }
             })
             openModalAviso()
@@ -70,22 +66,14 @@ const Usuarios =({usuarios, rows}) => {
         }
         refreshData()
     }
-
+    
     const handleSubmitEditar = async (e) => {
         e.preventDefault()
-        const {id, email, clave, nombre, dni, telefono}=formValue
-        const res = await axios.put('/api/usuarios', {
-            id: [id],
-            email:[email],
-            clave: [clave],
-            nombre: [nombre],
-            dni: [dni],
-            telefono: [telefono]
-        }, config)
+        const res = await axios.put('/api/ongs', formValue, config)
         if(res.status==200){
             setMensaje(()=>{
                 return{
-                    mensaje: 'Usuario editado correctamente'
+                    mensaje: 'ONG editada correctamente'
                 }
             })
             openModalAviso()
@@ -98,7 +86,7 @@ const Usuarios =({usuarios, rows}) => {
     const handleSubmitEliminar = async (e) => {
         e.preventDefault()
         const id=formValue.id
-        const res = await axios.delete('/api/usuarios', {
+        const res = await axios.delete('/api/ongs', {
             headers:{
                 authorization: token
             },
@@ -110,7 +98,7 @@ const Usuarios =({usuarios, rows}) => {
         if(res.status==200){
             setMensaje(()=>{
                 return{
-                    mensaje: 'Usuario eliminado correctamente'
+                    mensaje: 'ONG eliminado correctamente'
                 }
             })
             if(showModalAviso){
@@ -167,24 +155,27 @@ const Usuarios =({usuarios, rows}) => {
         })
     }
 
-    const crearUsuario = <button onClick={openModalCrear} className="bg-green-600 text-white px-5 py-2 hover:bg-green-700">Añadir usuario +</button>
+    const crearONG = <button onClick={openModalCrear} className="bg-green-600 text-white px-5 py-2 hover:bg-green-700">Añadir ONG +</button>
 
     const pasarDatos = (e) => {
         let idUsuario = $(e.currentTarget).parent().siblings().eq(0).attr("id");
-        let emailUsuario = $(e.currentTarget).parent().siblings().eq(1).attr("uservalue");
-        let nombreUsuario = $(e.currentTarget).parent().siblings().eq(2).attr("uservalue");
-        let dniUsuario = $(e.currentTarget).parent().siblings().eq(3).attr("uservalue");
-        let telefonoUsuario = $(e.currentTarget).parent().siblings().eq(4).attr("uservalue");
+        let nombre = $(e.currentTarget).parent().siblings().eq(1).attr("uservalue");
+        let descripcion = $(e.currentTarget).parent().siblings().eq(2).attr("uservalue");
+        let email = $(e.currentTarget).parent().siblings().eq(3).attr("uservalue");
+        let direccion = $(e.currentTarget).parent().siblings().eq(4).attr("uservalue");
+        let telefono = $(e.currentTarget).parent().siblings().eq(5).attr("uservalue");
         setFormValue(() =>{
             return {
                 id: idUsuario,
-                email : emailUsuario,
+                nombre: nombre,
+                descripcion:descripcion,
+                email : email,
                 clave : '',
-                nombre: nombreUsuario,
-                dni:dniUsuario,
-                telefono:telefonoUsuario
+                direccion: direccion,
+                telefono: telefono
             }
         })
+        console.log(formValue)
     }
 
     const pasarDatosEliminar = (e) => {
@@ -202,12 +193,12 @@ const Usuarios =({usuarios, rows}) => {
             <AvisoModal id="modalAviso" mensaje={mensaje.mensaje} showModal={showModalAviso} setShowModal={setShowModalAviso}>
             </AvisoModal>
        
-            <AdminTemplate button={crearUsuario} title="Usuarios">
+            <AdminTemplate button={crearONG} title="ONGs">
 
                 <Modal id="modalEliminar" showModal={showModalEliminar} setShowModal={setShowModalEliminar}>
                     <div className="py-10 px-10">
-                        <h1 className="text-center border-b-2">Eliminar usuario</h1>
-                        <p className="py-5">¿Está seguro de que quiere eliminar el registro?</p>
+                        <h1 className="text-center border-b-2">Eliminar Proyecto</h1>
+                        <p className="py-5">¿Está seguro de que quiere eliminar el proyecto?</p>
                         <form className="flex flex-col" onSubmit={handleSubmitEliminar}>
                             <input type="hidden" name="id" value={formValue.id}/>
                             <button type="submit" className="bg-red-500 mt-5 px-5 py-3 rounded-lg hover:bg-red-700">Eliminar</button>
@@ -218,50 +209,66 @@ const Usuarios =({usuarios, rows}) => {
 
                 <Modal showModal={showModalCrear} setShowModal={setShowModalCrear}>
                     <div className="py-10 px-10">
-                        <h1 className="text-center">Crear nuevo usuario</h1>
-                        <form className="flex flex-col" onSubmit={handleSubmit}>
-                            <label className="py-2">Email:</label>
-                            <input type="email" onChange={handleChange} name="email" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <label className="py-2">Contraseña:</label>
-                            <input type="password" onChange={handleChange} name="clave" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                        <h1 className="text-center mb-5">Crear nuevo usuario</h1>
+                        <form onSubmit={handleSubmit} id="formEditar" className="flex flex-col">
                             <div className="columns-2">
                                 <div>
-                                    <label className="py-2">Nombre:</label><br />
-                                    <input type="text" onChange={handleChange} name="nombre" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                    <label className="py-2">Email:</label><br />
+                                    <input id="editaremail" type="email" onChange={handleChange} name="email" className="py-2 px-2 bg-gray-300 rounded-lg"/>
                                 </div>
                                 <div>
-                                    <label className="py-2">DNI:</label><br />
-                                    <input type="text" onChange={handleChange} name="dni" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                    <label className="py-2">Contraseña:</label><br />
+                                    <input type="password" onChange={handleChange} name="clave" className="py-2 px-2 bg-gray-300 rounded-lg"/>
                                 </div>
                             </div>
-                            <label className="py-2">Teléfono:</label>
-                            <input type="text" onChange={handleChange} name="telefono" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Crear Usuario</button>
+                            <label className="mt-3">Nombre:</label>
+                            <input id="editarnombre" type="text" onChange={handleChange} name="nombre" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <label className="mt-3">Descripción:</label>
+                            <input  id="editardescripcion" type="text" onChange={handleChange} name="descripcion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <div className="mt-3 columns-2">
+                                <div>
+                                    <label className="py-2">Dirección:</label><br />
+                                    <input id="editarnombre" type="text" onChange={handleChange} name="direccion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                </div>
+                                <div>
+                                    <label className="py-2">Teléfono:</label><br />
+                                    <input id="editarnombre" type="text" onChange={handleChange} name="telefono" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                </div>
+                            </div>
+                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Crear ONG</button>
                         </form>
                     </div>
                 </Modal>
 
                 <Modal id="modalEditar" showModal={showModalEditar} setShowModal={setShowModalEditar}>
                 <div className="py-10 px-10">
-                        <h1 className="text-center">Editar usuario</h1>
+                        <h1 className="text-center pb-5">Editar ONG</h1>
                         <form onSubmit={handleSubmitEditar} id="formEditar" className="flex flex-col">
-                            <label className="py-2">Email:</label>
-                            <input id="editaremail" type="email" onChange={handleChange} value={formValue.email} name="email" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <label className="py-2">Nueva Contraseña:</label>
-                            <input type="password" onChange={handleChange} value={formValue.clave} name="clave" className="py-2 px-2 bg-gray-300 rounded-lg"/>
                             <div className="columns-2">
                                 <div>
-                                    <label className="py-2">Nombre:</label><br />
-                                    <input id="editarnombre" type="text" onChange={handleChange} value={formValue.nombre} name="nombre" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                    <label className="py-2">Email:</label><br />
+                                    <input id="editaremail" type="email" onChange={handleChange} value={formValue.email} name="email" className="py-2 px-2 bg-gray-300 rounded-lg"/>
                                 </div>
                                 <div>
-                                    <label className="py-2">DNI:</label><br />
-                                    <input  id="editardni" type="text" onChange={handleChange} value={formValue.dni} name="dni" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                    <label className="py-2">Nueva Contraseña:</label><br />
+                                    <input type="password" onChange={handleChange} value={formValue.clave} name="clave" className="py-2 px-2 bg-gray-300 rounded-lg"/>
                                 </div>
                             </div>
-                            <label className="py-2">Teléfono:</label>
-                            <input id="editartelefono" type="text" onChange={handleChange} value={formValue.telefono} name="telefono" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Editar Usuario</button>
+                            <label className="mt-3">Nombre:</label>
+                            <input id="editarnombre" type="text" onChange={handleChange} value={formValue.nombre} name="nombre" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <label className="mt-3">Descripción:</label>
+                            <input  id="editardescripcion" type="text" onChange={handleChange} value={formValue.descripcion} name="descripcion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <div className="mt-3 columns-2">
+                                <div>
+                                    <label className="py-2">Dirección:</label><br />
+                                    <input id="editarnombre" type="text" onChange={handleChange} value={formValue.direccion} name="direccion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                </div>
+                                <div>
+                                    <label className="py-2">Teléfono:</label><br />
+                                    <input id="editarnombre" type="text" onChange={handleChange} value={formValue.telefono} name="telefono" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                </div>
+                            </div>
+                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Editar ONG</button>
                         </form>
                     </div>
                 </Modal>
@@ -275,21 +282,22 @@ const Usuarios =({usuarios, rows}) => {
                     <thead className="bg-slate-800 text-white">
                         <tr>
                             <td className="px-14 text-center py-3 border-r-2 border-slate-900 rounded-tl-lg">#</td>
-                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">emailUsuario</td>
-                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">Nombre</td>
-                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">DNI</td>
+                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">Nombre ONG</td>
+                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">Email</td>
+                            <td className="px-14 text-center py-3 border-l-2 border-slate-900">Dirección</td>
                             <td className="px-14 text-center py-3 border-l-2 border-slate-900">Teléfono</td>
                             <td className="px-14 text-center py-3 border-l-2 border-slate-900 rounded-tr-lg"></td>
                         </tr>
                     </thead>
                     <tbody>
-                        {rows[showPage]?.map((usuario, index) => (
-                        <tr id="parent" key={usuario.idUsuario}>
-                            <td id={usuario.idUsuario} uservalue={usuario.idUsuario} className="text-center py-3 border-x-2 border-gray">{usuario.idUsuario}</td>
-                            <td uservalue={usuario.emailUsuario} className="text-center py-3 border-r-2 border-gray px-2">{usuario.emailUsuario}</td>
-                            <td uservalue={usuario.nombreDonante} className="text-center py-3 border-r-2 border-gray px-2">{usuario.nombreDonante}</td>
-                            <td uservalue={usuario.dniDonante} className="text-center py-3 border-r-2 border-gray">{usuario.dniDonante}</td>
-                            <td uservalue={usuario.telefonoDonante} className="text-center py-3 border-r-2 border-gray">{usuario.telefonoDonante}</td>
+                        {rows[showPage]?.map((ong, index) => (
+                        <tr id="parent" key={ong.idUsuario}>
+                            <td id={ong.idUsuario} uservalue={ong.idUsuario} className="text-center py-3 border-x-2 border-gray">{ong.idUsuario}</td>
+                            <td uservalue={ong.nombreONG} className="text-center py-3 border-r-2 border-gray px-2">{ong.nombreONG}</td>
+                            <td uservalue={ong.descripcionONG} className="hidden">{ong.descripcionONG}</td>
+                            <td uservalue={ong.emailUsuario} className="text-center py-3 border-r-2 border-gray">{ong.emailUsuario}</td>
+                            <td uservalue={ong.direccionONG} className="text-center py-3 border-r-2 border-gray">{ong.direccionONG}</td>
+                            <td uservalue={ong.telefonoONG} className="text-center py-3 border-r-2 border-gray">{ong.telefonoONG}</td>
                             <td className="text-center py-3 border-r-2 border-gray">
                                     <button onClick={openModalEditar} className="bg-orange-500 text-white p-2 rounded-lg mr-2 hover:bg-orange-600"><AiFillEdit /></button>
                                     <button onClick={openModalEliminar} className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"><FiDelete /></button>
@@ -326,11 +334,11 @@ export const getServerSideProps =async context =>{
         }
       };
       try{
-          const { data }= await axios.get('http://localhost:3000/api/usuarios', config)
+          const { data }= await axios.get('http://localhost:3000/api/ongs', config)
           let rows=[]
           let row=[]
-          data.forEach(function(usuario, index) {
-              row.push(usuario)
+          data.forEach(function(ong, index) {
+              row.push(ong)
               if(row.length==7||index==data.length-1){
                   rows.push(row)
                   row=[]
@@ -338,7 +346,7 @@ export const getServerSideProps =async context =>{
           });
           return {
             props: {
-                usuarios: data,
+                ongs: data,
                 rows: rows
             }
         }
@@ -360,4 +368,4 @@ export const getServerSideProps =async context =>{
     
 }
 
-export default Usuarios
+export default ONGS

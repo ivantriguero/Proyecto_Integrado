@@ -11,7 +11,27 @@ import Cookies from 'js-cookie';
 import { motion } from "framer-motion"
 
 
-const Usuarios =({usuarios, rows}) => {
+const Proyectos =({proyectos, rows}) => {
+
+    const [mostrarAvisoFecha, setmostrarAvisoFecha]=useState(false)
+
+    const formatDate = (date) => {
+        let d = new Date(date)
+        let month=d.getMonth()+1<10?0+(d.getMonth()+1).toString():d.getMonth()+1
+        let day=d.getDate()<10?0+(d.getDate()).toString():d.getDate()
+        const formatedDate=day+"-"+month+"-"+d.getFullYear()
+        return formatedDate
+    }
+
+    const formatDatetoSQL = (date) => {
+        let d = new Date(date)
+        let month=d.getMonth()+1<10?0+(d.getMonth()+1).toString():d.getMonth()+1
+        let day=d.getDate()<10?0+(d.getDate()).toString():d.getDate()
+        const formatedDate=d.getFullYear()+"-"+month+"-"+day
+        return formatedDate
+    }
+
+
     let token = Cookies.get('accessToken')
     if(token==undefined||token==null){
         token=''
@@ -28,11 +48,11 @@ const Usuarios =({usuarios, rows}) => {
         router.replace(router.asPath);
     }
     const [formValue, setFormValue] = useState({
-        email : '',
-        clave : '',
-        nombre: '',
-        dni:'',
-        telefono:''
+        titulo : '',
+        descripcion : '',
+        dinero: '0',
+        fecha: formatDatetoSQL(new Date(Date.now())),
+        fechaLimite:'',
     });
     const handleChange = (e) =>{
         const {name, value} = e.target
@@ -50,55 +70,51 @@ const Usuarios =({usuarios, rows}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const {email, clave, nombre, dni, telefono}=formValue
-        const res = await axios.post('/api/usuarios', {
-            email:[email],
-            clave: [clave],
-            nombre: [nombre],
-            dni: [dni],
-            telefono: [telefono]
-        },config)
-        if(res.status==200){
-            setMensaje(()=>{
-                return{
-                    mensaje: 'Usuario creado correctamente'
-                }
-            })
-            openModalAviso()
+        if(formValue.fecha>formValue.fechaLimite){
+            setmostrarAvisoFecha(true);
         }else{
-
+            const res = await axios.post('/api/proyectos', formValue, config)
+            if(res.status==200){
+                setMensaje(()=>{
+                    return{
+                        mensaje: 'Proyecto creada correctamente'
+                    }
+                })
+                openModalAviso()
+            }else{
+    
+            }
+            refreshData()
         }
-        refreshData()
+        console.log(formValue)
     }
-
+    
     const handleSubmitEditar = async (e) => {
         e.preventDefault()
-        const {id, email, clave, nombre, dni, telefono}=formValue
-        const res = await axios.put('/api/usuarios', {
-            id: [id],
-            email:[email],
-            clave: [clave],
-            nombre: [nombre],
-            dni: [dni],
-            telefono: [telefono]
-        }, config)
-        if(res.status==200){
-            setMensaje(()=>{
-                return{
-                    mensaje: 'Usuario editado correctamente'
-                }
-            })
-            openModalAviso()
+        if(formValue.fecha>formValue.fechaLimite){
+            setmostrarAvisoFecha(true);
         }else{
-
+            const res = await axios.put('/api/proyectos', formValue, config)
+            if(res.status==200){
+                setMensaje(()=>{
+                    return{
+                        mensaje: 'Proyecto editada correctamente'
+                    }
+                })
+                openModalAviso()
+            }else{
+    
+            }
+            setmostrarAvisoFecha(false);
+            refreshData()
         }
-        refreshData()
+        console.log(formValue)
     }
 
     const handleSubmitEliminar = async (e) => {
         e.preventDefault()
         const id=formValue.id
-        const res = await axios.delete('/api/usuarios', {
+        const res = await axios.delete('/api/proyectos', {
             headers:{
                 authorization: token
             },
@@ -110,7 +126,7 @@ const Usuarios =({usuarios, rows}) => {
         if(res.status==200){
             setMensaje(()=>{
                 return{
-                    mensaje: 'Usuario eliminado correctamente'
+                    mensaje: 'Proyecto eliminado correctamente'
                 }
             })
             if(showModalAviso){
@@ -129,12 +145,14 @@ const Usuarios =({usuarios, rows}) => {
     const [showModalCrear, setShowModalCrear]=useState(false)
     const openModalCrear = () => {
         setShowModalCrear(prev => !prev)
+        setmostrarAvisoFecha(false);
     }
 
     const [showModalEditar, setShowModalEditar]=useState(false)
     const openModalEditar = (e) => {
         setShowModalEditar(prev => !prev)
         pasarDatos(e)
+        setmostrarAvisoFecha(false);
     }
     
     const [showModalEliminar, setShowModalEliminar]=useState(false)
@@ -167,31 +185,33 @@ const Usuarios =({usuarios, rows}) => {
         })
     }
 
-    const crearUsuario = <button onClick={openModalCrear} className="bg-green-600 text-white px-5 py-2 hover:bg-green-700">Añadir usuario +</button>
+    const crearproyecto = <button onClick={openModalCrear} className="bg-green-600 text-white px-5 py-2 hover:bg-green-700">Añadir proyecto +</button>
 
     const pasarDatos = (e) => {
-        let idUsuario = $(e.currentTarget).parent().siblings().eq(0).attr("id");
-        let emailUsuario = $(e.currentTarget).parent().siblings().eq(1).attr("uservalue");
-        let nombreUsuario = $(e.currentTarget).parent().siblings().eq(2).attr("uservalue");
-        let dniUsuario = $(e.currentTarget).parent().siblings().eq(3).attr("uservalue");
-        let telefonoUsuario = $(e.currentTarget).parent().siblings().eq(4).attr("uservalue");
+        let idProyecto = $(e.currentTarget).parent().siblings().eq(0).attr("id");
+        let titulo = $(e.currentTarget).parent().siblings().eq(1).attr("uservalue");
+        let descripcion = $(e.currentTarget).parent().siblings().eq(2).attr("uservalue");
+        let dinero = $(e.currentTarget).parent().siblings().eq(3).attr("uservalue");
+        let fecha = $(e.currentTarget).parent().siblings().eq(4).attr("uservalue");
+        let fechaLimite = $(e.currentTarget).parent().siblings().eq(5).attr("uservalue");
         setFormValue(() =>{
             return {
-                id: idUsuario,
-                email : emailUsuario,
-                clave : '',
-                nombre: nombreUsuario,
-                dni:dniUsuario,
-                telefono:telefonoUsuario
+                id: idProyecto,
+                titulo: titulo,
+                descripcion:descripcion,
+                dinero: dinero,
+                fecha : fecha,
+                fechaLimite : fechaLimite
             }
         })
+        console.log(formValue)
     }
 
     const pasarDatosEliminar = (e) => {
-        let idUsuario = $(e.currentTarget).parent().siblings().eq(0).attr("id");
+        let idProyecto = $(e.currentTarget).parent().siblings().eq(0).attr("id");
         setFormValue(() =>{
             return {
-                id: idUsuario
+                id: idProyecto
             }
         })
 
@@ -202,7 +222,7 @@ const Usuarios =({usuarios, rows}) => {
             <AvisoModal id="modalAviso" mensaje={mensaje.mensaje} showModal={showModalAviso} setShowModal={setShowModalAviso}>
             </AvisoModal>
        
-            <AdminTemplate button={crearUsuario} title="Usuarios">
+            <AdminTemplate button={crearproyecto} title="Proyectos">
 
                 <Modal id="modalEliminar" showModal={showModalEliminar} setShowModal={setShowModalEliminar}>
                     <div className="py-10 px-10">
@@ -216,52 +236,42 @@ const Usuarios =({usuarios, rows}) => {
                     </div>
                 </Modal>
 
-                <Modal showModal={showModalCrear} setShowModal={setShowModalCrear}>
-                    <div className="py-10 px-10">
-                        <h1 className="text-center">Crear nuevo usuario</h1>
-                        <form className="flex flex-col" onSubmit={handleSubmit}>
-                            <label className="py-2">Email:</label>
-                            <input type="email" onChange={handleChange} name="email" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <label className="py-2">Contraseña:</label>
-                            <input type="password" onChange={handleChange} name="clave" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <div className="columns-2">
-                                <div>
-                                    <label className="py-2">Nombre:</label><br />
-                                    <input type="text" onChange={handleChange} name="nombre" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                                </div>
-                                <div>
-                                    <label className="py-2">DNI:</label><br />
-                                    <input type="text" onChange={handleChange} name="dni" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                                </div>
-                            </div>
-                            <label className="py-2">Teléfono:</label>
-                            <input type="text" onChange={handleChange} name="telefono" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Crear Usuario</button>
+                <Modal showModal={showModalCrear} className="w-2/5" setShowModal={setShowModalCrear}>
+                    <div className="py-10 px-10 w-full">
+                        <h1 className="text-center">Crear nuevo Proyecto</h1>
+                        <form onSubmit={handleSubmit} id="formEditar" className="flex flex-col">
+                            <label className="">Título proyecto:</label>
+                            <input type="text" required onChange={handleChange} name="titulo" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <label className="mt-3">Descripción:</label>
+                            <textarea style={{resize:'none'}} rows="4" type="text" onChange={handleChange} name="descripcion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <label className="mt-3">Fecha Límite:</label>
+                            <input type="date" required onChange={handleChange} name="fechaLimite" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            {mostrarAvisoFecha?<span className="text-red-500">!La fecha no puede ser antes del día de hoy!</span>:null}
+                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Crear proyecto</button>
                         </form>
                     </div>
                 </Modal>
 
-                <Modal id="modalEditar" showModal={showModalEditar} setShowModal={setShowModalEditar}>
-                <div className="py-10 px-10">
-                        <h1 className="text-center">Editar usuario</h1>
+                <Modal id="modalEditar" showModal={showModalEditar} className="w-2/5" setShowModal={setShowModalEditar}>
+                <div className="py-10 px-10 w-full">
+                        <h1 className="text-center">Crear nuevo Proyecto</h1>
                         <form onSubmit={handleSubmitEditar} id="formEditar" className="flex flex-col">
-                            <label className="py-2">Email:</label>
-                            <input id="editaremail" type="email" onChange={handleChange} value={formValue.email} name="email" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <label className="py-2">Nueva Contraseña:</label>
-                            <input type="password" onChange={handleChange} value={formValue.clave} name="clave" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <label className="">Título proyecto:</label>
+                            <input type="text" required onChange={handleChange} value={formValue.titulo} name="titulo" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                            <label className="mt-3">Descripción:</label>
+                            <textarea style={{resize:'none'}} rows="4" type="text" value={formValue.descripcion} onChange={handleChange} name="descripcion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
                             <div className="columns-2">
                                 <div>
-                                    <label className="py-2">Nombre:</label><br />
-                                    <input id="editarnombre" type="text" onChange={handleChange} value={formValue.nombre} name="nombre" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                    <label className="mt-3">Fecha Límite:</label>
+                                    <input type="date" required onChange={handleChange} value={formValue.fechaLimite} name="fechaLimite" className="w-full py-2 px-2 bg-gray-300 rounded-lg"/>
                                 </div>
                                 <div>
-                                    <label className="py-2">DNI:</label><br />
-                                    <input  id="editardni" type="text" onChange={handleChange} value={formValue.dni} name="dni" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                                <label className="mt-3">Fecha Creación:</label>
+                            <input type="date" required onChange={handleChange} value={formValue.fecha} name="fecha" className="w-full py-2 px-2 bg-gray-300 rounded-lg"/>
                                 </div>
                             </div>
-                            <label className="py-2">Teléfono:</label>
-                            <input id="editartelefono" type="text" onChange={handleChange} value={formValue.telefono} name="telefono" className="py-2 px-2 bg-gray-300 rounded-lg"/>
-                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Editar Usuario</button>
+                            {mostrarAvisoFecha?<span className="text-red-500">!La fecha no puede ser antes del día de hoy!</span>:null}
+                            <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Editar proyecto</button>
                         </form>
                     </div>
                 </Modal>
@@ -275,21 +285,22 @@ const Usuarios =({usuarios, rows}) => {
                     <thead className="bg-slate-800 text-white">
                         <tr>
                             <td className="px-14 text-center py-3 border-r-2 border-slate-900 rounded-tl-lg">#</td>
-                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">emailUsuario</td>
-                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">Nombre</td>
-                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">DNI</td>
-                            <td className="px-14 text-center py-3 border-l-2 border-slate-900">Teléfono</td>
+                            <td className="px-14 text-center py-3 border-r-2 border-slate-900">Título</td>
+                            <td className="px-14 text-center py-3 border-l-2 border-slate-900">Dinero donado</td>
+                            <td className="px-14 text-center py-3 border-l-2 border-slate-900">Fecha publicación</td>
+                            <td className="px-14 text-center py-3 border-l-2 border-slate-900">Fecha límite</td>
                             <td className="px-14 text-center py-3 border-l-2 border-slate-900 rounded-tr-lg"></td>
                         </tr>
                     </thead>
                     <tbody>
-                        {rows[showPage]?.map((usuario, index) => (
-                        <tr id="parent" key={usuario.idUsuario}>
-                            <td id={usuario.idUsuario} uservalue={usuario.idUsuario} className="text-center py-3 border-x-2 border-gray">{usuario.idUsuario}</td>
-                            <td uservalue={usuario.emailUsuario} className="text-center py-3 border-r-2 border-gray px-2">{usuario.emailUsuario}</td>
-                            <td uservalue={usuario.nombreDonante} className="text-center py-3 border-r-2 border-gray px-2">{usuario.nombreDonante}</td>
-                            <td uservalue={usuario.dniDonante} className="text-center py-3 border-r-2 border-gray">{usuario.dniDonante}</td>
-                            <td uservalue={usuario.telefonoDonante} className="text-center py-3 border-r-2 border-gray">{usuario.telefonoDonante}</td>
+                        {rows[showPage]?.map((proyecto, index) => (
+                        <tr id="parent" key={proyecto.idProyecto}>
+                            <td id={proyecto.idProyecto} uservalue={proyecto.idProyecto} className="text-center py-3 border-x-2 border-gray">{proyecto.idProyecto}</td>
+                            <td uservalue={proyecto.tituloProyecto} className="text-center py-3 border-r-2 border-gray px-2">{proyecto.tituloProyecto}</td>
+                            <td uservalue={proyecto.descripcionProyecto} className="hidden">{proyecto.descripcionProyecto}</td>
+                            <td uservalue={proyecto.dineroProyecto} className="text-center py-3 border-r-2 border-gray">{proyecto.dineroProyecto} €</td>
+                            <td uservalue={formatDatetoSQL(proyecto.fechaProyecto)} className="text-center py-3 border-r-2 border-gray">{formatDate(proyecto.fechaProyecto)}</td>
+                            <td uservalue={formatDatetoSQL(proyecto.fechaLimiteProyecto)} className="text-center py-3 border-r-2 border-gray">{formatDate(proyecto.fechaLimiteProyecto)}</td>
                             <td className="text-center py-3 border-r-2 border-gray">
                                     <button onClick={openModalEditar} className="bg-orange-500 text-white p-2 rounded-lg mr-2 hover:bg-orange-600"><AiFillEdit /></button>
                                     <button onClick={openModalEliminar} className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"><FiDelete /></button>
@@ -326,19 +337,20 @@ export const getServerSideProps =async context =>{
         }
       };
       try{
-          const { data }= await axios.get('http://localhost:3000/api/usuarios', config)
+          const { data }= await axios.get('http://localhost:3000/api/proyectos', config)
           let rows=[]
           let row=[]
-          data.forEach(function(usuario, index) {
-              row.push(usuario)
+          data.forEach(function(proyecto, index) {
+              row.push(proyecto)
               if(row.length==7||index==data.length-1){
                   rows.push(row)
                   row=[]
               }
+              
           });
           return {
             props: {
-                usuarios: data,
+                proyectos: data,
                 rows: rows
             }
         }
@@ -360,4 +372,4 @@ export const getServerSideProps =async context =>{
     
 }
 
-export default Usuarios
+export default Proyectos

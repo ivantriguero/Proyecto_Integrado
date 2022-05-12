@@ -1,6 +1,7 @@
 import {pool} from '../../../config/bd'
 import { serverRuntimeConfig } from '../../../next.config'
 import jwt from 'jsonwebtoken'
+import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 
 
 export default async function handler(req, res){
@@ -20,3 +21,4 @@ export default async function handler(req, res){
         )
     }
 }
+
