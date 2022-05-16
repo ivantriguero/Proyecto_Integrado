@@ -1,23 +1,17 @@
 import Link from "next/link"
 import {FaLeaf} from "react-icons/fa"
 
-const NavBar = ({showLogin, setShowLogin}) => {
-
-    const monstrarLogin=()=>{
-        setShowLogin(prev => !prev)
-    }
-
+const NavBar = () => {
     return (
         <>
-        <nav className="px-20 py-5 transparent flex fixed top-0 left-0 right-0 text-white justify-between">
-            <FaLeaf />
+        <nav className="px-20 py-5 shadow-lg bg-white flex sticky z-20 top-0 left-0 right-0 text-gray-700 items-center justify-between">
+            <Link href="/"><button><FaLeaf  className="text-2xl text-green-700"/></button></Link>
             <ul className="flex">
-                <li className="px-3">Sobre Nosotros</li>
-                <li className="px-3">Servicios</li>
-                <li className="px-3">ONGs</li>
-                <li className="px-3">Registrarse</li>
+                <Link href="/sobreNosotros"><button className="px-3 font-medium">Sobre Nosotros</button></Link>
+                <Link href="/ONGPage"><button className="px-3 font-medium">ONGs</button></Link>
+                <button className="px-3 font-medium">Registrarse</button>
             </ul>
-            <button onClick={monstrarLogin} className="bg-green-500 px-5 py-2 rounded-full hover:bg-green-600">Iniciar sesión</button>
+            <button className="px-5 py-2 bg-green-700 rounded-lg text-white hover:bg-green-800">Iniciar sesión</button>
         </nav>
         </>
     )

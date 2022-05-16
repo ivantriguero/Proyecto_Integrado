@@ -1,7 +1,7 @@
 import NavBar from "../components/NavBar"
 import { motion } from "framer-motion"
 
-const ONGPage = () =>{
+const sobreNosotros = () =>{
     return (
         <>
         <motion.div
@@ -79,4 +79,4 @@ const ONGPage = () =>{
     )
 }
 
-export default ONGPage
+export default sobreNosotros

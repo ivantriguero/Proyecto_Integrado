@@ -1,5 +1,5 @@
 import { Header } from "../components/HeaderComponent"
-import NavBar from "../components/NavBar"
+import NavBarHome from "../components/NavBarHome"
 import Login from "./Login"
 import { useState } from "react"
 
@@ -8,7 +8,7 @@ const HomePage = ({showLogin, setShowLogin}) => {
     
     return (
         <>
-        <NavBar showLogin={showLogin} setShowLogin={setShowLogin}/>
+        <NavBarHome showLogin={showLogin} setShowLogin={setShowLogin}/>
         <div className="container">
             <div id="Header" className="h-screen text-white text-center place-content-center flex flex-col items-center">
                 <div className="w-1/2">

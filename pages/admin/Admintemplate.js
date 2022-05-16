@@ -17,7 +17,6 @@ const AdminTemplate = ({children, button, title}) => {
                             <Link href="/admin/ongs"><li id="ongs" className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaHands className="mx-5"/>ONGs</li></Link>
                             <Link href="/admin/proyectos"><li id="proyectos" className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaProjectDiagram className="mx-5"/>Proyectos</li></Link>
                             <Link href="/admin/categorias"><li id="categorias" className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaVectorSquare className="mx-5"/>Categorías</li></Link>
-                            <li id="peticiones" className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaForward className="mx-5"/>Peticiones</li>
                         </ul>
                     </div>
                     <div className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaSignOutAlt className="mx-5"/>Cerrar sesión</div>
