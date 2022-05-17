@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken'
 import Admin from './admin'
 
 
-const Home =()=>{
+const Home =(showLogin, setShowLogin)=>{
   let tipoUsuario='';
 
   const [reload, setReload]=useState(false)
@@ -23,18 +23,12 @@ const Home =()=>{
             tipoUsuario =decoded.tipoUsuario
         }
       })
-      
-      const [showLogin, setShowLogin]=useState(false)
-
       return (
     <motion.div
     initial={{opacity:0 }}
     animate={{opacity:1 }}
     transition={{duration: 1.5}}
     exit={{opacity:0 }}>
-    <AnimatePresence>
-      {showLogin && (<Login reload={reload} setReload={setReload} showLogin={showLogin} setShowLogin={setShowLogin} />)}
-    </AnimatePresence>
     <HomePage showLogin={showLogin} setShowLogin={setShowLogin} />
      
     </motion.div>
