@@ -13,7 +13,7 @@ const NavBarHome = ({showLogin, setShowLogin}) => {
             <button className="text-2xl"><FaLeaf /></button>
             <ul className="flex">
                 <Link href="/sobreNosotros"><button className="px-3">Sobre Nosotros</button></Link>
-                <Link href="/ONGPage"><button className="px-3">ONGs</button></Link>
+                <Link href="/ONGS"><button className="px-3">ONGs</button></Link>
                 <button className="px-3">Registrarse</button>
             </ul>
             <button onClick={monstrarLogin} className="bg-green-500 px-5 py-2 rounded-full hover:bg-green-600">Iniciar sesión</button>

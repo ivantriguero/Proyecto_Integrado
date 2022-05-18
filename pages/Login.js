@@ -8,11 +8,14 @@ import jwt from 'jsonwebtoken'
 import { serverRuntimeConfig } from '../next.config'
 import cookieCutter from 'cookie-cutter'
 import { useRouter } from "next/router"
+import Modal from '../components/Modal'
 
 const Login = ({showLogin, setShowLogin}) => {
     const router = useRouter()
 
     const [mostarError, setMostrarError]=useState(false)
+
+    const [showModal, setShowModal]=useState(false)
 
     const [formValue, setFormValue] = useState({
         email : '',
@@ -67,10 +70,12 @@ const Login = ({showLogin, setShowLogin}) => {
                     console.log(user)
               });
         }catch(error){
-            if(error.response.status==403){
-                console.log("hola que tal")
+            if(error.response.data.message=="Este usuario no existe"){
                 setMostrarError(()=>true)
-                console.log(mostarError)
+                console.log(error.response.data)
+            }else if(error.response.data.message=="Este email no está confirmado"){
+                setShowModal(()=>true)
+                console.log(error.response.data)
             }
         }
        
@@ -79,6 +84,8 @@ const Login = ({showLogin, setShowLogin}) => {
 
     return(
         <>
+
+
             <motion.div
                 key="login"
                 initial={{ y: 0-1000}}
@@ -86,6 +93,11 @@ const Login = ({showLogin, setShowLogin}) => {
                 transition={{duration: 1 }}
                 exit={{ y: 0-10000}}
                 id="login" className="container fixed z-20 bg-green-700 h-screen flex flex-col items-center justify-center">
+                <Modal id="modalAviso" showModal={showModal} setShowModal={setShowModal}>
+                    <div className="py-10 px-10">
+                        <h1>Primero tienes que confirmar tu email</h1>
+                    </div>
+                </Modal>
                     {showLogin ? 
                     <button  onClick={monstrarLogin}>
                         <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
@@ -105,7 +117,7 @@ const Login = ({showLogin, setShowLogin}) => {
                     animate={{ y: 0 }}
                     transition={{duration: 0.5 }}
                     exit={{ y: 0-10000}}
-                    id="errorMessage" className="bg-red-600 fixed top-10 text-white py-3 px-5 w-2/6 mb-5 rounded-xl text-center flex items-center justify-center"><AiFillWarning className="mx-2" />Este usuario no existe</motion.div>:null}
+                    id="errorMessage" className="bg-red-600 fixed top-10 text-white py-3 px-5 w-2/6 mb-5 rounded-xl text-center flex items-center justify-center"><AiFillWarning className="mx-2" />El email o la contraseña no son correctos</motion.div>:null}
                     <div className="bg-black text-white w-70 h-2/3 py-10 px-10 rounded-md shadow-md shadow-gray-900">
                     <form onSubmit={handleSubmit} className="flex flex-col justify-center">
                         <h1 className="text-center">Inicia sesión en tu cuenta</h1>

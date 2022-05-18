@@ -30,7 +30,7 @@ const mail = {
     }
   }
 
-const getTemplate= (name, token) => {
+const getTemplate= (name, token, email) => {
     return `
     
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -468,7 +468,7 @@ const getTemplate= (name, token) => {
       <![endif]-->
       </head>
       <body style="width: 100%; height: 100%; margin: 0; -webkit-text-size-adjust: none; font-family: 'Nunito Sans', Helvetica, Arial, sans-serif; background-color: #F2F4F6; color: #51545E;">
-        <span class="preheader" style="display: none; visibility: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden;">Use this link to reset your password. The link is only valid for 24 hours.</span>
+        <span class="preheader" style="display: none; visibility: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden;">Confirmar correo</span>
         <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; margin: 0; padding: 0; -premailer-width: 100%; -premailer-cellpadding: 0; -premailer-cellspacing: 0; background-color: #F2F4F6;" bgcolor="#F2F4F6">
           <tr>
             <td align="center" style="word-break: break-word; font-family: 'Nunito Sans', Helvetica, Arial, sans-serif; font-size: 16px;">
@@ -499,7 +499,10 @@ const getTemplate= (name, token) => {
                                   <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
                                     <tr>
                                       <td align="center" style="word-break: break-word; font-family: 'Nunito Sans', Helvetica, Arial, sans-serif; font-size: 16px;">
-                                        <a href="http://localhost:3000/api/register/confirm/${ token }" class="f-fallback button button--green" target="_blank" style="color: #FFF; background-color: #22BC66; border-top: 10px solid #22BC66; border-right: 18px solid #22BC66; border-bottom: 10px solid #22BC66; border-left: 18px solid #22BC66; display: inline-block; text-decoration: none; border-radius: 3px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); -webkit-text-size-adjust: none; box-sizing: border-box;">Confirma tu email</a>
+                                      <form action='http://localhost:3000/api/register/confirm/${ token }' method='POST'>
+                                        <input type="hidden" name="email" value="${email}">
+                                        <input type="submit" value="Confirma tu email" class="f-fallback button button--green" target="_blank" style="color: #FFF; background-color: #22BC66; border-top: 10px solid #22BC66; border-right: 18px solid #22BC66; border-bottom: 10px solid #22BC66; border-left: 18px solid #22BC66; display: inline-block; text-decoration: none; border-radius: 3px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); -webkit-text-size-adjust: none; box-sizing: border-box;" />
+                                      </form>
                                       </td>
                                     </tr>
                                   </table>
@@ -518,11 +521,9 @@ const getTemplate= (name, token) => {
                     <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation" style="width: 570px; margin: 0 auto; padding: 0; -premailer-width: 570px; -premailer-cellpadding: 0; -premailer-cellspacing: 0; text-align: center;">
                       <tr>
                         <td class="content-cell" align="center" style="word-break: break-word; font-family: 'Nunito Sans', Helvetica, Arial, sans-serif; font-size: 16px; padding: 45px;">
-                          <p class="f-fallback sub align-center" style="margin: .4em 0 1.1875em; line-height: 1.625; text-align: center; font-size: 13px; color: #A8AAAF;">&copy; 2021 [Product Name]. All rights reserved.</p>
+                          <p class="f-fallback sub align-center" style="margin: .4em 0 1.1875em; line-height: 1.625; text-align: center; font-size: 13px; color: #A8AAAF;">&copy; 2021 Iván Triguero Curado. All rights reserved.</p>
                           <p class="f-fallback sub align-center" style="margin: .4em 0 1.1875em; line-height: 1.625; text-align: center; font-size: 13px; color: #A8AAAF;">
-                            [Company Name, LLC]
-                            <br>1234 Street Rd.
-                            <br>Suite 1234
+                            Proyecto Final
                           </p>
                         </td>
                       </tr>

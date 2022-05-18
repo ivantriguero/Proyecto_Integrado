@@ -1,80 +1,124 @@
-import NavBar from "../components/NavBar"
-import { motion } from "framer-motion"
+import { useState } from "react"
+import { FaLeaf } from "react-icons/fa"
+import Link from "next/link"
+import AvisoModal from '../components/AvisoModal'
+import Modal from '../components/Modal'
+import {RiLogoutBoxLine} from 'react-icons/ri'
 
-const ONGPage = () =>{
+const ONGPage = () => {
+    
+    const formatDate = (date) => {
+        let d = new Date(date)
+        let month=d.getMonth()+1<10?0+(d.getMonth()+1).toString():d.getMonth()+1
+        let day=d.getDate()<10?0+(d.getDate()).toString():d.getDate()
+        const formatedDate=day+"-"+month+"-"+d.getFullYear()
+        return formatedDate
+    }
+
+    const formatDatetoSQL = (date) => {
+        let d = new Date(date)
+        let month=d.getMonth()+1<10?0+(d.getMonth()+1).toString():d.getMonth()+1
+        let day=d.getDate()<10?0+(d.getDate()).toString():d.getDate()
+        const formatedDate=d.getFullYear()+"-"+month+"-"+day
+        return formatedDate
+    }
+
+    const [showModalAviso, setShowModalAviso]=useState(false)
+
+    const [mostrarAvisoFecha, setmostrarAvisoFecha]=useState(false)
+
+    const openModalAviso = (e) => {
+        if(showModalAviso){
+            setShowModalAviso(prev => prev)
+        }else{
+            setShowModalAviso(prev => !prev)
+        }
+    }
+
+    const [mensaje, setMensaje] = useState({
+        mensaje: ''
+    })
+
+    const [formValue, setFormValue] = useState({
+        titulo : '',
+        descripcion : '',
+        dinero: '0',
+        fecha: formatDatetoSQL(new Date(Date.now())),
+        fechaLimite:'',
+    });
+
+
+
+    const handleChange = (e) =>{
+        const {name, value} = e.target
+        setFormValue((prevState) => {
+            return {
+                ...prevState,
+                [name]: value
+            }
+        })
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        if(formValue.fecha>formValue.fechaLimite){
+            setmostrarAvisoFecha(true);
+        }else{
+            const res = await axios.post('/api/crearproyecto', formValue, config)
+            if(res.status==200){
+                setMensaje(()=>{
+                    return{
+                        mensaje: 'Proyecto creada correctamente'
+                    }
+                })
+                openModalAviso()
+            }else{
+    
+            }
+            refreshData()
+        }
+        console.log(formValue)
+    }
+
+    const [showModalCrear, setShowModalCrear]=useState(false)
+    const openModalCrear = () => {
+        setShowModalCrear(prev => !prev)
+        setmostrarAvisoFecha(false);
+    }
+
     return (
         <>
-        <motion.div
-        initial={{ y: 0-1000,opacity:0 }}
-        animate={{ y: 0, opacity:1 }}
-        transition={{duration: 1 }}
-        exit={{ y: 0-1000,opacity:0 }}
-        >
-        <NavBar />
-        </motion.div>
-        <motion.div
-        initial={{opacity:0 }}
-        animate={{opacity:1 }}
-        transition={{duration: 1 }}
-        exit={{opacity:0 }}
-        >
-
-        <div className="py-20 text-gray-700 px-40 w-full flex justify-center items-center">
-            <div className="flex flex-col justify-center items-center px-20">
-                <h1 className="mb-10 text-5xl font-bold">Texto de ejemplo</h1>
-                <p className="text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc rutrum, libero in sagittis mattis, sem lorem tincidunt lacus, eu varius nisi magna in nunc. Nam gravida varius tellus et accumsan. Maecenas et ligula ante. Integer porttitor maximus tortor, et vulputate ligula bibendum eu. Cras accumsan ipsum enim, sit amet congue felis pulvinar quis. Nunc vitae elit ac nisi tempor viverra et in augue. Maecenas neque elit, gravida eget quam sit amet, aliquam maximus ipsum. In ac felis ac elit ultricies vehicula. Maecenas tincidunt molestie nunc in luctus.</p>
-            </div>
-        </div>
-        <div className="grid grid-cols-2 p-10">
-            <div className="pb-10">
-                <h1 className="border-b-4 border-green-600 text-4xl py-3">MISIÓN y VISIÓN</h1>
-                <p className="py-3">
-                    Misión
-                    <br />
-                    La Plataforma de ONG de Acción Social es una organización cuya misión consiste en defender los derechos de los grupos y personas más desfavorecidos, promover la participación en el ámbito de la Acción Social, generar cambio social, representar a sus organizaciones ante los poderes públicos y liderar a éstas en torno a un proyecto compartido.
-                    <br />
-                    Visión
-                    <br />
-                    La visión de la Plataforma de ONG de Acción Social es ser una organización de referencia para las entidades del Tercer Sector de Acción Social de forma que encuentren en nuestra organización un cauce que multiplique los efectos positivos de la acción social gracias a que:
-                    <br />
-                    Hemos alcanzado el estatus de Agente Social.
-                    Somos un referente e interlocutor reconocido ante la sociedad civil, ante las Administraciones Públicas y ante las propias ONG de Acción Social.
-                    Lideramos el reconocimiento, el desarrollo, la vertebración y la cohesión del Tercer Sector de Acción Social.
-                    Somos independientes y tiene más representatividad.
-
-                </p>
+            <AvisoModal id="modalAviso" mensaje={mensaje.mensaje} showModal={showModalAviso} setShowModal={setShowModalAviso}>
+            </AvisoModal>
+            <Modal showModal={showModalCrear} className="w-2/5" setShowModal={setShowModalCrear}>
+                <div className="py-10 px-10 w-full">
+                    <h1 className="text-center">Crear nuevo Proyecto</h1>
+                    <form onSubmit={handleSubmit} id="formEditar" className="flex flex-col">
+                        <label className="">Título proyecto:</label>
+                        <input type="text" required onChange={handleChange} name="titulo" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                        <label className="mt-3">Descripción:</label>
+                        <textarea style={{resize:'none'}} rows="4" type="text" onChange={handleChange} name="descripcion" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                        <label className="mt-3">Fecha Límite:</label>
+                        <input type="date" required onChange={handleChange} name="fechaLimite" className="py-2 px-2 bg-gray-300 rounded-lg"/>
+                        {mostrarAvisoFecha?<span className="text-red-500">!La fecha no puede ser antes del día de hoy!</span>:null}
+                        <button type="submit" className="bg-green-500 mt-5 px-5 py-3 rounded-lg hover:bg-green-600">Crear proyecto</button>
+                    </form>
                 </div>
-                <div className="m-5 flex justify-center items-center p-10">
-                    <div className="overflow-hidden rounded-xl rotate-12">
-                       <img className="" src="/ong.jpg" />  
-                    </div>
+            </Modal>
+            <nav className="px-10 py-5 shadow-lg bg-white sticky z-20 top-0 left-0 right-0 text-gray-700 grid grid-cols-3">
+                <div className="flex justify-start items-center">
+                    <Link href="/"><button><FaLeaf  className="text-3xl text-green-700"/></button></Link>
                 </div>
-                <div className="m-5 flex justify-center items-center p-10">
-                    <div className="overflow-hidden rounded-xl rotate-12">
-                       <img className="" src="/ong.jpg" />  
-                    </div>
+                <div className="flex justify-center">
+                    <button onClick={openModalCrear} className="bg-green-600 text-white px-5 py-2 hover:bg-green-700">Crear Proyecto</button>                
                 </div>
-                <div className="py-10">
-                <h1 className="border-b-4 border-green-600 text-4xl py-3">MISIÓN y VISIÓN</h1>
-                <p className="py-3">
-                    Misión
-                    <br />
-                    La Plataforma de ONG de Acción Social es una organización cuya misión consiste en defender los derechos de los grupos y personas más desfavorecidos, promover la participación en el ámbito de la Acción Social, generar cambio social, representar a sus organizaciones ante los poderes públicos y liderar a éstas en torno a un proyecto compartido.
-                    <br />
-                    Visión
-                    <br />
-                    La visión de la Plataforma de ONG de Acción Social es ser una organización de referencia para las entidades del Tercer Sector de Acción Social de forma que encuentren en nuestra organización un cauce que multiplique los efectos positivos de la acción social gracias a que:
-                    <br />
-                    Hemos alcanzado el estatus de Agente Social.
-                    Somos un referente e interlocutor reconocido ante la sociedad civil, ante las Administraciones Públicas y ante las propias ONG de Acción Social.
-                    Lideramos el reconocimiento, el desarrollo, la vertebración y la cohesión del Tercer Sector de Acción Social.
-                    Somos independientes y tiene más representatividad.
-
-                </p>
+                <div className="flex justify-end">
+                    <button className="px-5 py-2 text-gray-700 flex justify-center items-center hover:text-gray-900"><RiLogoutBoxLine className="mr-3 text-xl" />Cerrar sesión</button>
                 </div>
+            </nav>
+            <div id="contenido">
 
             </div>
-        </motion.div>
         </>
     )
 }

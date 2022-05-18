@@ -5,7 +5,7 @@ import { getTemplate, sendEmail } from '../../../config/mail.config'
 import { uuid } from 'uuidv4';
 
 export default async function handler(req, res){
-    const {email, clave, nombre, dni, telefono}= req.body
+    const {email, clave, nombre, descripcion, direccion, telefono, tipoUsuario}= req.body
     console.log(email)
     const [rows]= await pool.query("SELECT * FROM proyectointegrado.Usuario where emailUsuario='"+email+"';")
     if(rows.length==0){
@@ -14,13 +14,19 @@ export default async function handler(req, res){
         
         const token = jwt.sign({email, code}, serverRuntimeConfig.secret, {expiresIn: '24h'})
         
-        const template = getTemplate(nombre,token)
+        const template = getTemplate(nombre,token, email)
         
         console.log(code)
         console.log(code.length)
 
-        const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Usuario` (`emailUsuario`, `claveUsuario`, `tipoUsuario`, `token`) VALUES ('"+email+"', SHA('"+clave+"'), 'don', '"+code+"');")
-        await pool.query("INSERT INTO `proyectointegrado`.`Donante` (`idDonante`, `nombreDonante`, `dniDonante`, `telefonoDonante`) VALUES ('"+r.insertId+"', '"+nombre+"', '"+dni+"', '"+telefono+"');")
+        
+        if(tipoUsuario=='don'){
+            const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Usuario` (`emailUsuario`, `claveUsuario`, `tipoUsuario`, `token`, `confirmado`) VALUES ('"+email+"', SHA('"+clave+"'), 'don', '"+code+"' , 0);")
+            await pool.query("INSERT INTO `proyectointegrado`.`Donante` (`idDonante`, `nombreDonante`, `dniDonante`, `telefonoDonante`) VALUES ('"+r.insertId+"', '"+nombre+"', '"+dni+"', '"+telefono+"');")
+        }else if(tipoUsuario=='ong'){
+            const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Usuario` (`emailUsuario`, `claveUsuario`, `tipoUsuario`, `token`, `confirmado`) VALUES ('"+email+"', SHA('"+clave+"'), 'ong', '"+code+"', 0);")
+            await pool.query("INSERT INTO `proyectointegrado`.`ONG` (`idONG`, `nombreONG`, `descripcionONG`, `direccionONG`, `telefonoONG`) VALUES ('"+r.insertId+"', '"+nombre+"', '"+descripcion+"', '"+direccion+"', '"+telefono+"');")
+        }
         await sendEmail(email, 'Email de prueba',template)
         res.status(200).json(
             token
