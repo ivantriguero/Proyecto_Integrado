@@ -1,16 +1,23 @@
 import NavBar from "../components/NavBar"
 import { motion } from "framer-motion"
+import Login from "./Login"
+import { useState } from "react"
 
 const sobreNosotros = () =>{
+
+    const [showLogin, setShowLogin] =useState(false)
+
     return (
         <>
+        
+        <Login showLogin={showLogin} setShowLogin={setShowLogin}/>
         <motion.div
         initial={{ y: 0-1000,opacity:0 }}
         animate={{ y: 0, opacity:1 }}
         transition={{duration: 1 }}
         exit={{ y: 0-1000,opacity:0 }}
         >
-        <NavBar />
+        <NavBar showLogin={showLogin} setShowLogin={setShowLogin} />
         </motion.div>
         <motion.div
         initial={{opacity:0 }}

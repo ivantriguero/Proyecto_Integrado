@@ -3,11 +3,14 @@ import NavBarHome from "../components/NavBarHome"
 import Login from "./Login"
 import { useState } from "react"
 
+const HomePage = () => {
+    
+    const [showLogin, setShowLogin] =useState(false)
 
-const HomePage = ({showLogin, setShowLogin}) => {
     
     return (
         <>
+        <Login showLogin={showLogin} setShowLogin={setShowLogin}/>
         <NavBarHome showLogin={showLogin} setShowLogin={setShowLogin}/>
         <div className="container">
             <div id="Header" className="h-screen text-white text-center place-content-center flex flex-col items-center">

@@ -21,13 +21,14 @@ export default async function handler(req, res){
 
         
         if(tipoUsuario=='don'){
+            const {dni} = req.body
             const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Usuario` (`emailUsuario`, `claveUsuario`, `tipoUsuario`, `token`, `confirmado`) VALUES ('"+email+"', SHA('"+clave+"'), 'don', '"+code+"' , 0);")
             await pool.query("INSERT INTO `proyectointegrado`.`Donante` (`idDonante`, `nombreDonante`, `dniDonante`, `telefonoDonante`) VALUES ('"+r.insertId+"', '"+nombre+"', '"+dni+"', '"+telefono+"');")
         }else if(tipoUsuario=='ong'){
             const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Usuario` (`emailUsuario`, `claveUsuario`, `tipoUsuario`, `token`, `confirmado`) VALUES ('"+email+"', SHA('"+clave+"'), 'ong', '"+code+"', 0);")
             await pool.query("INSERT INTO `proyectointegrado`.`ONG` (`idONG`, `nombreONG`, `descripcionONG`, `direccionONG`, `telefonoONG`) VALUES ('"+r.insertId+"', '"+nombre+"', '"+descripcion+"', '"+direccion+"', '"+telefono+"');")
         }
-        await sendEmail(email, 'Email de prueba',template)
+        await sendEmail(email, 'Confirmar email',template)
         res.status(200).json(
             token
         )

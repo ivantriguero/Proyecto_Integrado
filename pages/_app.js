@@ -6,13 +6,10 @@ import { useState } from 'react';
 
 function MyApp({ Component, pageProps}) {
 
-  const [showLogin, setShowLogin]=useState(false)
-
   const {pathname} = useRouter();
   return (
     <AnimatePresence exitBeforeEnter>
-      {showLogin && (<Login reload={reload} setReload={setReload} showLogin={showLogin} setShowLogin={setShowLogin} />)}
-      <Component showLogin={showLogin} setShowLogin={setShowLogin} key={pathname} {...pageProps} />
+      <Component key={pathname} {...pageProps} />
     </AnimatePresence>
     ) 
 }

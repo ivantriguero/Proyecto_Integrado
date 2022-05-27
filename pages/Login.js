@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion"
 import {BiArrowToLeft} from 'react-icons/bi'
 import {AiFillWarning} from 'react-icons/ai'
-import Link from "next/link"
 import { useState } from "react"
 import axios from "axios"
 import jwt from 'jsonwebtoken'
@@ -21,10 +20,12 @@ const Login = ({showLogin, setShowLogin}) => {
         email : '',
         clave : ''
     });
-    
+
+
     const monstrarLogin=()=>{
         setShowLogin(prev => !prev)
     }
+
 
     const handleChange = (e) =>{
         const {name, value} = e.target
@@ -83,8 +84,9 @@ const Login = ({showLogin, setShowLogin}) => {
 
 
     return(
-        <>
+        <AnimatePresence>
 
+        {showLogin ? 
 
             <motion.div
                 key="login"
@@ -92,23 +94,17 @@ const Login = ({showLogin, setShowLogin}) => {
                 animate={{ y: 0 }}
                 transition={{duration: 1 }}
                 exit={{ y: 0-10000}}
-                id="login" className="container fixed z-20 bg-green-700 h-screen flex flex-col items-center justify-center">
+                id="login" className="container fixed z-40 bg-green-700 h-screen flex flex-col items-center justify-center">
                 <Modal id="modalAviso" showModal={showModal} setShowModal={setShowModal}>
                     <div className="py-10 px-10">
                         <h1>Primero tienes que confirmar tu email</h1>
                     </div>
                 </Modal>
-                    {showLogin ? 
                     <button  onClick={monstrarLogin}>
                         <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
                             <BiArrowToLeft className="text-4xl" />
                         </a>
-                        </button>:
-                    <Link  href="/">
-                        <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
-                            <BiArrowToLeft className="text-4xl" />
-                        </a>
-                    </Link>}
+                        </button>
                     
                     
                     {mostarError ? <motion.div
@@ -131,9 +127,10 @@ const Login = ({showLogin, setShowLogin}) => {
 
                     </div>
                 </motion.div>
+            :null}
 
             
-        </>
+        </AnimatePresence>
         
     )
 }

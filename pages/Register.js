@@ -48,6 +48,8 @@ const Register = ({showLogin, setShowLogin}) => {
         try{
             const res = await axios.post('/api/register', formValue)
             setRegistroCorrecto(true)
+            setMostrarError(()=>false)
+
 
         }catch(error){
             if(error.response.status==403){
@@ -60,37 +62,17 @@ const Register = ({showLogin, setShowLogin}) => {
 
     return(
         <>
-            <motion.div
-                key="login"
-                initial={{ y: 0-1000}}
-                animate={{ y: 0 }}
-                transition={{duration: 1 }}
-                exit={{ y: 0-10000}}
-                id="login" className="container fixed z-20 bg-green-700 h-screen flex flex-col items-center justify-center">
-                    {showLogin ? 
-                    <button  onClick={monstrarLogin}>
-                        <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
-                            <BiArrowToLeft className="text-4xl" />
-                        </a>
-                        </button>:
-                    <Link  href="/">
-                        <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
-                            <BiArrowToLeft className="text-4xl" />
-                        </a>
-                    </Link>}
-                    
-                    
                     {mostarError ? <motion.div
                     key="error"
                     initial={{ y: 0-500}}
                     animate={{ y: 0 }}
                     transition={{duration: 0.5 }}
                     exit={{ y: 0-10000}}
-                    id="errorMessage" className="bg-red-600 fixed top-10 text-white py-3 px-5 w-2/6 mb-5 rounded-xl text-center flex items-center justify-center"><AiFillWarning className="mx-2" />Este email ya existe</motion.div>:null}
+                    id="errorMessage" className="bg-red-600 fixed top-10 text-white py-3 px-5 w-5/6 mb-5 rounded-xl text-center flex items-center justify-center"><AiFillWarning className="mx-2" />Este email ya existe</motion.div>:null}
                     {regristroCorrecto==false?
                     <>
-                        <h1 className="text-white text-4xl font-semibold mb-10">Registrarse</h1>
-                        <div className="bg-black text-white w-70 py-5 px-10 rounded-md shadow-md shadow-gray-900">
+                        <h1 className="text-green-700 text-4xl font-semibold mb-10">Registrar donante</h1>
+                        <div className="bg-green-700 text-white w-70 py-5 px-10 rounded-md shadow-md shadow-gray-900">
                         <form onSubmit={handleSubmit} className="flex flex-col justify-center">
                             <label className="mt-5">Email:</label>
                             <input className="h-9 rounded-lg text-black px-2" onChange={handleChange} type="text" name="email"/>
@@ -109,18 +91,15 @@ const Register = ({showLogin, setShowLogin}) => {
                                     <input className="h-9 rounded-lg text-black px-2" onChange={handleChange} type="text" name="telefono"/>
                                 </div>
                             </div>
-                            <button type="submit" className="bg-green-500 rounded-lg mt-10 px-5 py-2 hover:bg-green-600">Registrarse</button>
+                            <button type="submit" className="bg-black text-white rounded-lg mt-10 px-5 py-2">Registrarse</button>
                         </form>
 
                         </div>
                     </>
                     :<>
-                        <h1 className="text-4xl text-white mb-10">¡Usuario registrado!</h1>
-                        <p className="text-white">Comprueba tu correo para confirmar tu registro</p>
-                        <Link href="/"><button className="bg-white px-5 py-3 rounded-xl text-green-700 mt-10 border-2 border-white hover:bg-green-700 hover:text-white">Volver al Inicio</button></Link>
-                    </>}
-                </motion.div>
- 
+                        <h1 className="text-4xl text-green-800 mb-10">¡Usuario registrado!</h1>
+                        <p className="text-green-800">Comprueba tu correo para confirmar tu registro</p>
+                    </>} 
         </>
         
     )

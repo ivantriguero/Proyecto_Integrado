@@ -10,14 +10,18 @@ const authenticated = (fn) => async (
       if(!err && decoded){
           return await fn(req,res)
       }
-
       res.status(403).json({message : 'No estás autenticado'})
   })
 }
 
 export default authenticated(async function handler(req, res) {
+  var token=jwt.verify(req.headers.authorization, serverRuntimeConfig.secret)
   switch (req.method){
     case "GET":
+      if(req.query.id!=null){
+        const [rows]=await pool.query("SELECT * from Proyecto where idProyecto="+req.query.id+";")
+        return res.status(200).json(rows[0])
+      }
       const [rows]=await pool.query("SELECT * from Proyecto;")
       return res.status(200).json(rows)
     case "POST":
@@ -25,7 +29,7 @@ export default authenticated(async function handler(req, res) {
       const descripcion=req.body.descripcion
       const fechaLimite=req.body.fechaLimite
       const fecha=req.body.fecha
-      const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Proyecto` (`tituloProyecto`, `descripcionProyecto`, `dineroProyecto`, `fechaProyecto`, `fechaLimiteProyecto`) VALUES ('"+titulo+"', '"+descripcion+"', '0', '"+fecha+"', '"+fechaLimite+"');")
+      const [r]=await pool.query("INSERT INTO `proyectointegrado`.`Proyecto` (`tituloProyecto`, `descripcionProyecto`, `dineroProyecto`, `fechaProyecto`, `fechaLimiteProyecto`, `idONG`) VALUES ('"+titulo+"', '"+descripcion+"', '0', '"+fecha+"', '"+fechaLimite+"', "+token.idUsuario+");")
       return res.status(200).json(r)
     case "PUT":
       const ide= req.body.id
@@ -34,7 +38,7 @@ export default authenticated(async function handler(req, res) {
       const fechaLimitee=req.body.fechaLimite
       const fechae=req.body.fecha
       const re=await pool.query("UPDATE `proyectointegrado`.`Proyecto` SET `tituloProyecto` = '"+tituloe+"', `descripcionProyecto` = '"+descripcione+"', `fechaProyecto` = '"+fechae+"', `fechaLimiteProyecto` = '"+fechaLimitee+"' WHERE (`idProyecto` = '"+ide+"');")
-      return res.status(200).json(re).end()
+      return res.status(200).json(re)
     case "DELETE":
       const id=req.body.id
       await pool.query("DELETE FROM `proyectointegrado`.`Proyecto` WHERE (`idProyecto` = '"+id+"');")

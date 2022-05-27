@@ -1,17 +1,16 @@
 import HomePage from "./HomePage"
-import { AnimatePresence, motion } from "framer-motion"
 import { useState } from "react"
-import Login from "./Login"
 import Cookies from 'js-cookie';
 import { serverRuntimeConfig } from '../next.config'
 import jwt from 'jsonwebtoken'
-import Admin from './admin'
+import { motion } from "framer-motion";
+const Home =()=>{
 
 
-const Home =(showLogin, setShowLogin)=>{
   let tipoUsuario='';
 
   const [reload, setReload]=useState(false)
+
 
   let token = Cookies.get('accessToken')
     if(token==undefined||token==null){
@@ -29,7 +28,7 @@ const Home =(showLogin, setShowLogin)=>{
     animate={{opacity:1 }}
     transition={{duration: 1.5}}
     exit={{opacity:0 }}>
-    <HomePage showLogin={showLogin} setShowLogin={setShowLogin} />
+        <HomePage />
      
     </motion.div>
   )
