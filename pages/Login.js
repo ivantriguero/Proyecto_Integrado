@@ -14,7 +14,15 @@ const Login = ({showLogin, setShowLogin}) => {
 
     const [mostarError, setMostrarError]=useState(false)
 
+    const [mostarErrorPass, setMostrarErrorPass]=useState(false)
+
     const [showModal, setShowModal]=useState(false)
+
+    const [showModalPass, setShowModalPass]=useState(false)
+
+    const openModalPass = (e) => {
+        setShowModalPass(prev => !prev)
+    }
 
     const [formValue, setFormValue] = useState({
         email : '',
@@ -57,7 +65,7 @@ const Login = ({showLogin, setShowLogin}) => {
                     const user=decoded
                     if (user.tipoUsuario=="admin"){
                         router.push({
-                            pathname: '/admin'
+                            pathname: '/admin/usuarios'
                         })
                     }else if(user.tipoUsuario=="don"){
                         router.push({
@@ -82,6 +90,27 @@ const Login = ({showLogin, setShowLogin}) => {
        
     }
 
+    const [showMenPass, setShowMenPass]= useState(false)
+
+    const handleSubmitPass = async (e) => {
+        const {email}=formValue
+        e.preventDefault()
+        try{
+            setShowMenPass(true)
+            const res = await axios.post('/api/recuperarpass', {
+                email:[email]
+            })
+
+        }catch(error){
+            if(error.response.data.message=="Este correo no existe"){
+                setMostrarErrorPass(()=>true)
+            }else if(error.response.data.message=="Este email no está confirmado"){
+                setShowModal(()=>true)
+            }
+        }
+       
+    }
+
 
     return(
         <AnimatePresence>
@@ -100,11 +129,31 @@ const Login = ({showLogin, setShowLogin}) => {
                         <h1>Primero tienes que confirmar tu email</h1>
                     </div>
                 </Modal>
-                    <button  onClick={monstrarLogin}>
-                        <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
-                            <BiArrowToLeft className="text-4xl" />
-                        </a>
-                        </button>
+                <Modal id="modalAviso" showModal={showModalPass} setShowModal={setShowModalPass}>
+                    <div className="py-10 px-10">
+                        {showMenPass? <>
+                        <h1 className="text-center text-lg text-gray-700">Mensaje enviado a tu correo</h1>
+                        <p>Hemos enviado un mensaje a tu correo para resetear tu contraseña</p>
+                        </>:
+                        <>
+                        <h1 className="text-center text-lg text-gray-700">Introduce tu correo para recuperar tu contraseña</h1>
+                        <form onSubmit={handleSubmitPass}>
+                            <input type="email" onChange={handleChange} placeholder="Email" name="email" className="px-2 mb-2 w-full mt-5 border-2 border-gray-500 py-1 rounded-lg" />
+                            {mostarErrorPass ? <span className="text-red-700 w-1/2 pl-1">Este correo no está registrado</span>:null}
+                            <button type="submit" className="w-full px-5 py-3 rounded-lg bg-green-700 hover:bg-green-900 text-white mt-5">Enviar correo</button>
+                        </form>
+                        </>
+                        }
+                        
+                        
+                    </div>
+                </Modal>
+
+                <button  onClick={monstrarLogin}>
+                    <a className="absolute border-2 border-transparent rounded-full top-5 left-5 hover:border-2 hover:rounded-full hover:border-black">
+                        <BiArrowToLeft className="text-4xl" />
+                    </a>
+                </button>
                     
                     
                     {mostarError ? <motion.div
@@ -122,8 +171,8 @@ const Login = ({showLogin, setShowLogin}) => {
                         <label className="mt-5">Contraseña:</label>
                         <input className="h-9 rounded-lg text-black px-2" onChange={handleChange} type="password" name="clave"/>
                         <button type="submit" className="bg-green-500 rounded-lg mt-10 px-5 py-2 hover:bg-green-600">Iniciar sesión</button>
-                        <a className="mt-2 text-sm">¿Olvidaste la contraseña?</a>
                     </form>
+                    <button onClick={openModalPass} className="mt-2 text-sm decoration-1 hover:underline decoration-solid">¿Olvidaste la contraseña?</button>
 
                     </div>
                 </motion.div>

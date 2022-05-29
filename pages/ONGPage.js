@@ -81,6 +81,11 @@ const ONGPage = (proyectos) => {
         }
     }
 
+    const cerrarSesion = () => {
+        Cookies.remove('accessToken')
+        refreshData()
+    }
+
     const [mensaje, setMensaje] = useState({
         mensaje: ''
     })
@@ -263,7 +268,7 @@ const ONGPage = (proyectos) => {
                     <button onClick={openModalCrear} className="bg-green-600 text-white px-5 py-2 hover:bg-green-700">Crear Proyecto</button>                
                 </div>
                 <div className="flex justify-end">
-                    <button className="px-5 py-2 text-gray-700 flex justify-center items-center hover:text-gray-900"><RiLogoutBoxLine className="mr-3 text-xl" />Cerrar sesión</button>
+                    <button onClick={cerrarSesion} className="px-5 py-2 text-gray-700 flex justify-center items-center hover:text-gray-900"><RiLogoutBoxLine className="mr-3 text-xl" />Cerrar sesión</button>
                 </div>
             </nav>
             
@@ -321,7 +326,7 @@ export const getServerSideProps =async context =>{
             }
         }
       }catch(error){
-        if(error.response.status==403){
+        if(error){
             return {
                 redirect: {
                   permanent: false,

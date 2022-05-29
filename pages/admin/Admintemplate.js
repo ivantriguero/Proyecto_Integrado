@@ -1,8 +1,18 @@
 import {FaLeaf, FaHands, FaUserAlt, FaProjectDiagram, FaVectorSquare,FaForward, FaSignOutAlt} from "react-icons/fa"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import Cookies from 'js-cookie';
+import { useRouter } from "next/router"
 
 const AdminTemplate = ({children, button, title}) => {
+
+    const router = useRouter();
+
+    const cerrarSesion = () => {
+        Cookies.remove('accessToken')
+        router.replace(router.asPath);
+    }
+
     return (
         <>
             <div className="container flex">    
@@ -19,7 +29,7 @@ const AdminTemplate = ({children, button, title}) => {
                             <Link href="/admin/categorias"><li id="categorias" className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaVectorSquare className="mx-5"/>Categorías</li></Link>
                         </ul>
                     </div>
-                    <div className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaSignOutAlt className="mx-5"/>Cerrar sesión</div>
+                    <button onClick={cerrarSesion} className="py-3 flex items-center hover:bg-slate-900 menu-item"><FaSignOutAlt className="mx-5"/>Cerrar sesión</button>
                 </div>
                 <div className="w-full flex flex-col">
                     <motion.div
