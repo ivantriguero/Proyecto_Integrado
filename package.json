@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@paypal/react-paypal-js": "^7.8.0",
+    "@paypal/checkout-server-sdk": "^1.0.3",
+    "@paypal/react-paypal-js": "^7.8.1",
     "axios": "^0.27.2",
     "cookie-cutter": "^0.2.0",
     "formik": "^2.2.9",

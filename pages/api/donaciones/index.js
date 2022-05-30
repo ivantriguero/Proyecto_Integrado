@@ -20,7 +20,7 @@ export default authenticated(async function handler(req, res) {
     case "GET":
       if(req.query.id!=null){
         const [rows]=await pool.query("SELECT * from Proyecto left join Donacion on Donacion.idProyecto=Proyecto.idProyecto left join Donante on Donante.idDonante=Donacion.idDonante where Proyecto.idProyecto="+req.query.id+";")
-        return res.status(200).json(rows[0])
+        return res.status(200).json(rows)
       }
       const [rows]=await pool.query("SELECT * from Proyecto;")
       return res.status(200).json(rows)
