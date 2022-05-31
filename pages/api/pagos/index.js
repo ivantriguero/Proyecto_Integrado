@@ -9,9 +9,9 @@ let environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
 let client = new paypal.core.PayPalHttpClient(environment);
 
 export default async function handler(req, res){
-    const {cantidad}=req.body
+    const {cantidad, idProyecto, idUsuario, fecha}=req.body
     if (req.method === "POST") {
-        console.log(cantidad)
+
         const request = new paypal.orders.OrdersCreateRequest()
         request.requestBody({
             "intent": "CAPTURE",

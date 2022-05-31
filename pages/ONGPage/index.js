@@ -2,12 +2,12 @@ import { useState } from "react"
 import { FaLeaf } from "react-icons/fa"
 import Link from "next/link"
 import $ from "jquery"
-import AvisoModal from '../components/AvisoModal'
-import Modal from '../components/Modal'
+import AvisoModal from "../../components/AvisoModal"
+import Modal from "../../components/Modal"
 import Cookies from 'js-cookie';
 import {RiLogoutBoxLine} from 'react-icons/ri'
 import { useRouter } from "next/router"
-import { serverRuntimeConfig } from '../next.config'
+import { serverRuntimeConfig } from '../../next.config'
 import {BsTrashFill, BsFillPencilFill} from 'react-icons/bs'
 import jwt from 'jsonwebtoken'
 import axios from "axios"
@@ -28,8 +28,6 @@ const ONGPage = (proyectos) => {
     const refreshData = () => {
         router.replace(router.asPath);
     }
-
-    console.log(proyectos)
 
     const formatDate = (date) => {
         let d = new Date(date)
@@ -73,6 +71,9 @@ const ONGPage = (proyectos) => {
 
     const [mostrarAvisoFecha, setmostrarAvisoFecha]=useState(false)
 
+    const [buscador, setBuscador]=useState('')
+
+
     const openModalAviso = (e) => {
         if(showModalAviso){
             setShowModalAviso(prev => prev)
@@ -108,6 +109,17 @@ const ONGPage = (proyectos) => {
                 [name]: value
             }
         })
+    }
+
+    const handleChangeBuscador = (e) =>{
+        const {name, value} = e.target
+        setBuscador((prevState) => {
+            return {
+                ...prevState,
+                [name]: value
+            }
+        })
+        console.log(buscador)
     }
 
     const handleSubmitEliminar = async (e) => {
@@ -276,11 +288,12 @@ const ONGPage = (proyectos) => {
                 <AvisoModal id="modalAviso" mensaje={mensaje.mensaje} showModal={showModalAviso} setShowModal={setShowModalAviso}>
                 </AvisoModal>
                 <div id="buscador" className="py-5">
-                    <input type="text" placeholder="Buscar Proyectos ..." className="w-full border-2 border-gray-300 px-3 py-2 rounded-lg" />
+                    <input type="text" onChange={handleChangeBuscador} value={buscador.buscador} name="buscador" placeholder="Buscar Proyectos ..." className="w-full border-2 border-gray-300 px-3 py-2 rounded-lg" />
                 </div>
                 <div className="grid grid-cols-3 gap-5 mt-10">
                     
                 {proyectos.proyectos.map((proyecto, index) => (
+                    buscador.buscador == '' || buscador.buscador == null || buscador.buscador == undefined || (proyecto.tituloProyecto.toLowerCase()).includes(buscador.buscador.toLowerCase())?
                     <div className="rounded-lg shadow-2xl p-10 hover:bg-gray-200">
                         <input type="hidden" value={proyecto.idProyecto}></input>
                         <div className="border-b-2 border-green-700 flex justify-between py-3">
@@ -295,8 +308,8 @@ const ONGPage = (proyectos) => {
                             <div>{proyecto.dineroProyecto}</div>
                             <div>{formatDate(proyecto.fechaProyecto)}</div>
                         </div>
-                        <button className="w-full bg-green-700 text-white rounded-lg shadow-lg py-2 mt-5 hover:bg-green-900">Ver detalles</button>
-                    </div>
+                        <Link href={"/ONGPage/proyecto/"+proyecto.idProyecto}><button className="w-full bg-green-700 text-white rounded-lg shadow-lg py-2 mt-5 hover:bg-green-900">Ver detalles</button></Link>
+                    </div>:null
                 ))}
 
                 </div>

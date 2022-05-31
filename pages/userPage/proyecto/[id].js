@@ -2,16 +2,24 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import {BsFillArrowUpCircleFill} from 'react-icons/bs'
 import { useState } from 'react'
-import Modal from '../../components/Modal'
+import Modal from '../../../components/Modal'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import Cookies from 'js-cookie';
+import jwt from 'jsonwebtoken'
+import { serverRuntimeConfig } from '../../../next.config'
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 
-const Post = ({proyectos, donaciones}) => {
+const Post = ({proyectos, donaciones,idUsuario}) => {
     const router = useRouter()
-    
-    console.log(donaciones)
+
+    let token = Cookies.get('accessToken')
+    if(token==undefined||token==null){
+        token=''
+    }
+
+
 
     const [formValue, setFormValue] = useState({
         cantidad:50
@@ -20,6 +28,11 @@ const Post = ({proyectos, donaciones}) => {
     const [showModalPagar, setShowModalPagar]=useState(false)
     const openModalCrear = () => {
         setShowModalPagar(prev => !prev)
+    }
+
+    const [showModalAviso, setShowModalAviso]=useState(false)
+    const openModalAviso = () => {
+        setShowModalAviso(prev => !prev)
     }
 
     const handleChange = (e) =>{
@@ -32,6 +45,14 @@ const Post = ({proyectos, donaciones}) => {
         })
     }
 
+    const formatDatetoSQL = (date) => {
+        let d = new Date(date)
+        let month=d.getMonth()+1<10?0+(d.getMonth()+1).toString():d.getMonth()+1
+        let day=d.getDate()<10?0+(d.getDate()).toString():d.getDate()
+        const formatedDate=d.getFullYear()+"-"+month+"-"+day
+        return formatedDate
+    }
+
     const formatDate = (date) => {
         let d = new Date(date)
         let month=d.getMonth()+1<10?0+(d.getMonth()+1).toString():d.getMonth()+1
@@ -42,6 +63,11 @@ const Post = ({proyectos, donaciones}) => {
 
     return (
         <>
+        <Modal showModal={showModalAviso} setShowModal={setShowModalAviso} className="w-3/4 overflow-y-scroll h-3/4">
+            <div>
+                <h1 className='text-4xl text-green-700 py-5 px-3'>Donación realizada correctamente</h1>
+            </div>
+        </Modal>
         <Modal showModal={showModalPagar} setShowModal={setShowModalPagar} className="w-3/4 overflow-y-scroll h-3/4">
             <div className="py-10 w-3/4">
                 <h1 className="text-center text-2xl mb-10 text-gray-800">Selecciona la cantidad</h1>
@@ -54,7 +80,10 @@ const Post = ({proyectos, donaciones}) => {
                             <PayPalButtons forceReRender={[formValue]} createOrder={async () =>{
                                 try{
                                     const res = await axios.post('/api/pagos', {
-                                        cantidad:formValue.cantidad
+                                        cantidad:formValue.cantidad,
+                                        idUsuario: idUsuario,
+                                        idProyecto: proyectos.idProyecto,
+                                        fecha: formatDatetoSQL(new Date())
                                     })
                                     return res.data.id
                                 }catch(error){
@@ -62,8 +91,15 @@ const Post = ({proyectos, donaciones}) => {
                                 }
                             }} 
                             onCancel={data => console.log("Compra cancelada")}
-                            onApprove={(data, actions)=>{
+                            onApprove={async (data, actions)=>{
                                 console.log(data)
+                                await axios.post('/api/pagos/success', {
+                                    cantidad:formValue.cantidad,
+                                    idUsuario: idUsuario,
+                                    idProyecto: proyectos.idProyecto,
+                                    fecha: formatDatetoSQL(new Date())
+                                })
+                                openModalAviso()
                                 actions.order.capture()
                             }}
                             style={{ layout: "vertical", color: "blue" }} />
@@ -95,7 +131,7 @@ const Post = ({proyectos, donaciones}) => {
                     <div style={{height:'500px'}} className='w-1/4'>
                             <h1 className='text-green-700 text-2xl text-center py-5 border-b-2 border-green-700'>Donaciones</h1>
                             <div style={{height:'400px'}} className='overflow-y-scroll'>
-                                {donaciones.map((donacion)=>(
+                                {donaciones.idDonacione!=null ?donaciones.map((donacion)=>(
                                    <>
                                     
                                         <div className='px-2 py-3 bg-gray-200 border-b-2 border-green-700'>
@@ -108,7 +144,9 @@ const Post = ({proyectos, donaciones}) => {
                                         </div>
                                     
                                     </>
-                                ))}
+                                )):<>
+                                    <span>No existen donaciones</span>
+                                </>}
                             </div>
                     </div>
                 </div>
@@ -142,12 +180,20 @@ export const getServerSideProps =async context =>{
                 id: id
             }
         })
+        var idUsuario=null
+        jwt.verify(token, serverRuntimeConfig.secret, async function(err, decoded){
+            if(!err && decoded){
+                idUsuario =decoded.idUsuario
+                console.log(decoded.idUsuario)
+            }
+          })
         const proyectos=data
         const donaciones=resDonaciones.data
         return {
             props: {
                 proyectos: proyectos,
-                donaciones: donaciones
+                donaciones: donaciones,
+                idUsuario: idUsuario
             }
         }
       }catch(error){
