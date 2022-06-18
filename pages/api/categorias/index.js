@@ -10,7 +10,6 @@ const authenticated = (fn) => async (
       if(!err && decoded){
           return await fn(req,res)
       }
-      console.log(req.headers)
       res.status(403).json({message : 'No estás autenticado'})
   })
 }

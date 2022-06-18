@@ -5,28 +5,26 @@ const mail = {
     pass: 'lxgbxywybexrbekq'
 }
 
-  // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // true for 465, false for other ports
+    secure: true, 
     auth: {
-      user: mail.user, // generated ethereal user
-      pass: mail.pass, // generated ethereal password
+      user: mail.user,
+      pass: mail.pass,
     },
   });
 
   const sendEmail = async (email, subject, html) =>{
     try{
         await transporter.sendMail({
-            from: mail.user, // sender address
-            to: email, // list of receivers
-            subject, // Subject line
-            text: "Hello!", // plain text body
-            html // html body
+            from: mail.user, 
+            to: email, 
+            subject, 
+            text: "Hello!", 
+            html 
           });
     }catch(error){
-        console.log(error)
     }
   }
 

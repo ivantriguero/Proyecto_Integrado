@@ -18,7 +18,6 @@ const Home =()=>{
     }
       jwt.verify(token, serverRuntimeConfig.secret, async function(err, decoded){
         if(!err && decoded){
-            console.log(decoded)
             tipoUsuario =decoded.tipoUsuario
         }
       })

@@ -35,7 +35,6 @@ const Post = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(formValue)
 
         try{
             const res = await axios.post('/api/recuperarpass/resetpass', formValue)

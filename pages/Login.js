@@ -50,6 +50,8 @@ const Login = ({showLogin, setShowLogin}) => {
         const {email, clave}=formValue
         e.preventDefault()
         try{
+            setShowModal(false)
+            setMostrarError(false)
             const res = await axios.post('/api/login', {
                 email:[email],
                 clave: [clave]
@@ -57,10 +59,8 @@ const Login = ({showLogin, setShowLogin}) => {
             const accessToken=res.data
             cookieCutter.set('accessToken', accessToken)
     
-            console.log(accessToken)
             jwt.verify(accessToken, serverRuntimeConfig.secret, function(err, decoded) {
                 if(err){
-                    console.log(err)
                 }
                     const user=decoded
                     if (user.tipoUsuario=="admin"){
@@ -76,15 +76,12 @@ const Login = ({showLogin, setShowLogin}) => {
                             pathname: '/ONGPage'
                         })
                     }
-                    console.log(user)
               });
         }catch(error){
             if(error.response.data.message=="Este usuario no existe"){
                 setMostrarError(()=>true)
-                console.log(error.response.data)
             }else if(error.response.data.message=="Este email no está confirmado"){
                 setShowModal(()=>true)
-                console.log(error.response.data)
             }
         }
        
@@ -96,10 +93,13 @@ const Login = ({showLogin, setShowLogin}) => {
         const {email}=formValue
         e.preventDefault()
         try{
-            setShowMenPass(true)
+            setShowModal(false)
+            setMostrarError(false)
             const res = await axios.post('/api/recuperarpass', {
                 email:[email]
             })
+            setShowMenPass(true)
+            
 
         }catch(error){
             if(error.response.data.message=="Este correo no existe"){
@@ -124,11 +124,14 @@ const Login = ({showLogin, setShowLogin}) => {
                 transition={{duration: 1 }}
                 exit={{ y: 0-10000}}
                 id="login" className="container fixed z-40 bg-green-700 h-screen flex flex-col items-center justify-center">
-                <Modal id="modalAviso" showModal={showModal} setShowModal={setShowModal}>
-                    <div className="py-10 px-10">
-                        <h1>Primero tienes que confirmar tu email</h1>
-                    </div>
-                </Modal>
+
+                {showModal ? <motion.div
+                    key="error"
+                    initial={{ y: 0-500}}
+                    animate={{ y: 0 }}
+                    transition={{duration: 0.5 }}
+                    exit={{ y: 0-10000}}
+                    id="errorMessage" className="bg-red-600 z-50 fixed top-10 text-white py-3 px-5 w-2/6 mb-5 rounded-xl text-center flex items-center justify-center"><AiFillWarning className="mx-2" />Primero tienes que confirmar tu email</motion.div>:null}
                 <Modal id="modalAviso" showModal={showModalPass} setShowModal={setShowModalPass}>
                     <div className="py-10 px-10">
                         {showMenPass? <>

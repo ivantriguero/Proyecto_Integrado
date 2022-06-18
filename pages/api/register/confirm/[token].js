@@ -6,7 +6,6 @@ export default async function handler(req, res){
     const { token } = req.query
     try{
         var decoded = jwt.verify(token, serverRuntimeConfig.secret);
-        console.log(decoded)
         const [r]=await pool.query("SELECT token FROM proyectointegrado.Usuario where emailUsuario='"+decoded.email+"';")
         if(r[0].token==decoded.code){
             await pool.query("UPDATE `proyectointegrado`.`Usuario` SET `token` = NULL WHERE (`emailUsuario` = '"+decoded.email+"');")
@@ -16,7 +15,6 @@ export default async function handler(req, res){
             return res.status(403).redirect('/errorEmail')
         }
     } catch(error){
-        console.log(error)
         const email = req.body.email
         await pool.query("DELETE FROM `proyectointegrado`.`Usuario` WHERE (`emailUsuario` = '"+email+"');")
         return res.status(403).redirect('/errorEmail')

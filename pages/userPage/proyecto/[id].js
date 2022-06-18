@@ -92,7 +92,6 @@ const Post = ({proyectos, donaciones,idUsuario}) => {
                             }} 
                             onCancel={data => console.log("Compra cancelada")}
                             onApprove={async (data, actions)=>{
-                                console.log(data)
                                 await axios.post('/api/pagos/success', {
                                     cantidad:formValue.cantidad,
                                     idUsuario: idUsuario,
@@ -131,7 +130,7 @@ const Post = ({proyectos, donaciones,idUsuario}) => {
                     <div style={{height:'500px'}} className='w-1/4'>
                             <h1 className='text-green-700 text-2xl text-center py-5 border-b-2 border-green-700'>Donaciones</h1>
                             <div style={{height:'400px'}} className='overflow-y-scroll'>
-                                {donaciones.idDonacione!=null ?donaciones.map((donacion)=>(
+                                {donaciones.length>0 &&donaciones[0].idDonacion!=null ?donaciones.map((donacion)=>(
                                    <>
                                     
                                         <div className='px-2 py-3 bg-gray-200 border-b-2 border-green-700'>
@@ -184,7 +183,6 @@ export const getServerSideProps =async context =>{
         jwt.verify(token, serverRuntimeConfig.secret, async function(err, decoded){
             if(!err && decoded){
                 idUsuario =decoded.idUsuario
-                console.log(decoded.idUsuario)
             }
           })
         const proyectos=data

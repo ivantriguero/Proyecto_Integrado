@@ -23,6 +23,7 @@ export default authenticated(async function handler(req, res) {
         return res.status(200).json(rows)
       }
       const [rows]=await pool.query("SELECT * from Proyecto;")
+      console.log(rows)
       return res.status(200).json(rows)
     case "POST":
       const titulo=req.body.titulo

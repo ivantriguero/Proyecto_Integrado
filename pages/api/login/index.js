@@ -14,7 +14,6 @@ export default async function handler(req, res){
         const emailUsuario=Usuario.emailUsuario
         const tipoUsuario=Usuario.tipoUsuario
         const confirmado=Usuario.confirmado
-        console.log(confirmado)
         if(confirmado==0){
             res.status(403).json({message:"Este email no está confirmado"})
         }else{

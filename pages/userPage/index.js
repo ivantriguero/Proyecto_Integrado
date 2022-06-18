@@ -44,7 +44,6 @@ const UserPage = (proyectos) => {
                 [name]: value
             }
         })
-        console.log(buscador)
     }
 
 

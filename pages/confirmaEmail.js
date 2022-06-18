@@ -12,9 +12,9 @@ const confirmaEmail = () =>{
                 </div>
                 <h1 className="text-2xl">Email confirmado correctamente</h1>
                 <Link href="/">
-                    <button className="mt-10 w-full px-5 bg-green-700 hover:bg-green-800 text-white rounded-lg shadow-lg px-10 py-5">
-                        Volver al inicio
-                    </button>
+                    <p className="mt-10 text-center w-full px-5 bg-green-700 hover:bg-green-800 text-white rounded-lg shadow-lg px-10 py-5">
+                        Ya puede cerrar esta página
+                    </p>
                 </Link>
             </div>
         </div>

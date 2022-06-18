@@ -13,7 +13,6 @@ export default async function handler(req, res){
             return res.status(403).redirect('/errorEmail')
         }
     } catch(error){
-        console.log(error)
         const email = req.body.email
         return res.status(403).redirect('/errorEmail')
 

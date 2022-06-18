@@ -332,7 +332,7 @@ export const getServerSideProps =async context =>{
         }
       };
       try{
-          const { data }= await axios.get('http://localhost:3000/api/ongs', config)
+          const { data }= await axios.get('http://localhost:3000/api/donaciones', config)
           let rows=[]
           let row=[]
           data.forEach(function(ong, index) {
@@ -344,7 +344,6 @@ export const getServerSideProps =async context =>{
           });
           return {
             props: {
-                ongs: data,
                 rows: rows
             }
         }

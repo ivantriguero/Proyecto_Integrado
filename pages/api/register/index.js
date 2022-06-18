@@ -6,7 +6,6 @@ import { uuid } from 'uuidv4';
 
 export default async function handler(req, res){
     const {email, clave, nombre, descripcion, direccion, telefono, tipoUsuario}= req.body
-    console.log(email)
     const [rows]= await pool.query("SELECT * FROM proyectointegrado.Usuario where emailUsuario='"+email+"';")
     if(rows.length==0){
         
@@ -15,10 +14,6 @@ export default async function handler(req, res){
         const token = jwt.sign({email, code}, serverRuntimeConfig.secret, {expiresIn: '24h'})
         
         const template = getTemplate(nombre,token, email)
-        
-        console.log(code)
-        console.log(code.length)
-
         
         if(tipoUsuario=='don'){
             const {dni} = req.body

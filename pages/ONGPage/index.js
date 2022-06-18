@@ -56,7 +56,6 @@ const ONGPage = (proyectos) => {
             setmostrarAvisoFecha(false);
             refreshData()
         }
-        console.log(formValue)
     }
 
     const formatDatetoSQL = (date) => {
@@ -119,7 +118,6 @@ const ONGPage = (proyectos) => {
                 [name]: value
             }
         })
-        console.log(buscador)
     }
 
     const handleSubmitEliminar = async (e) => {
@@ -171,7 +169,6 @@ const ONGPage = (proyectos) => {
             }
             refreshData()
         }
-        console.log(formValue)
     }
 
     const [showModalEliminar, setShowModalEliminar]=useState(false)
@@ -195,7 +192,6 @@ const ONGPage = (proyectos) => {
 
     const getDatos = async (e) => {
         let idProyecto = $(e.currentTarget).parent().parent().siblings().eq(0).attr("value");
-        console.log(token)
         const { data }= await axios.get('http://localhost:3000/api/proyectos',{
             headers:{
                 authorization: token
@@ -214,7 +210,6 @@ const ONGPage = (proyectos) => {
                 fechaLimite : formatDatetoSQL(data.fechaLimiteProyecto)
             }
         })
-        console.log(data)
     }
 
     return (

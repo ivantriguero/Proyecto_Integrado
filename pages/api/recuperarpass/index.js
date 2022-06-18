@@ -7,7 +7,6 @@ import { uuid } from 'uuidv4';
 
 export default async function handler(req, res){
     const {email}= req.body
-    console.log(email)
     const [rows]= await pool.query("SELECT * FROM Usuario WHERE emailUsuario='"+email+"';")
     if(rows.length==0){
         res.status(403).json({message:"Este correo no existe"})
@@ -30,7 +29,7 @@ export default async function handler(req, res){
             try{
                 const [r]=await pool.query("UPDATE `proyectointegrado`.`Usuario` SET `token` = '"+code+"' WHERE (`emailUsuario` = '"+email+"');")
                 await sendEmail(email, 'Recuperar contraseña',template)
-                res.status(200)-json({
+                res.status(200).json({
                     message:'correo enviado'
                 })
             }catch(error){

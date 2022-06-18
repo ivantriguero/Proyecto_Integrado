@@ -21,17 +21,8 @@ const RegisterPage = (proyectos) => {
 
     return (
         <>
-        <Modal id="modalRegistroDon" showModal={showRegisterDon} setShowModal={setShowRegisterDon}>
-            <div className="py-10 px-10">
-                <Register />
-            </div>
-        </Modal>
-
-        <Modal id="modalRegistroONG" showModal={showRegisterONG} setShowModal={setShowRegisterONG}>
-            <div className="py-10 px-10">
-                <RegisterONG />
-            </div>
-        </Modal>
+        <Register showRegister={showRegisterDon} setShowRegister={setShowRegisterDon}/>
+        <RegisterONG showRegister={showRegisterONG} setShowRegister={setShowRegisterONG}/>
         <motion.div
         initial={{ y: 0-1000}}
         animate={{ y: 0 }}

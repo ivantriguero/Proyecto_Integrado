@@ -1,5 +1,7 @@
 import AdminTemplate from "./Admintemplate"
 import {AiFillEdit, AiOutlineArrowLeft, AiOutlineArrowRight} from 'react-icons/ai'
+import {MdOutlineAttachMoney} from 'react-icons/md'
+import Link from "next/link"
 import {FiDelete} from 'react-icons/fi'
 import Modal from '../../components/Modal'
 import AvisoModal from '../../components/AvisoModal'
@@ -85,7 +87,6 @@ const Proyectos =({proyectos, rows}) => {
             }
             refreshData()
         }
-        console.log(formValue)
     }
     
     const handleSubmitEditar = async (e) => {
@@ -107,7 +108,6 @@ const Proyectos =({proyectos, rows}) => {
             setmostrarAvisoFecha(false);
             refreshData()
         }
-        console.log(formValue)
     }
 
     const handleSubmitEliminar = async (e) => {
@@ -169,7 +169,27 @@ const Proyectos =({proyectos, rows}) => {
         }
     }
 
+    const [showModalDon, setShowModalDon] = useState(false)
+
+    const mostrarDonaciones =async (e) => {
+        await pasarDatosEliminar(e)
+        let id=formValue.id
+        const {data} = await axios.get('http://localhost:3000/api/donaciones',{
+            headers:{
+                authorization: token
+            },
+            params:{
+                id: formValue.id
+            }
+        })
+        
+        setShowModalDon(true)
+        setDonaciones(()=>data)
+    }
+
     
+    const [donaciones, setDonaciones]= useState([])
+
     const [showPage, setShowPage]=useState(0)
     
     const nextPage = () => {
@@ -203,10 +223,9 @@ const Proyectos =({proyectos, rows}) => {
                 fechaLimite : fechaLimite
             }
         })
-        console.log(formValue)
     }
 
-    const pasarDatosEliminar = (e) => {
+    const pasarDatosEliminar = async (e) => {
         let idProyecto = $(e.currentTarget).parent().siblings().eq(0).attr("id");
         setFormValue(() =>{
             return {
@@ -222,6 +241,31 @@ const Proyectos =({proyectos, rows}) => {
             </AvisoModal>
        
             <AdminTemplate button={crearproyecto} title="Proyectos">
+
+            <Modal id="modalDon" showModal={showModalDon} className="w-2/5" setShowModal={setShowModalDon}>
+                    <div className="py-10 px-10 w-full">
+                    <h1 className='text-green-700 text-2xl text-center py-5 border-b-2 border-green-700'>Donaciones</h1>
+                            <div style={{height:'400px'}} className='overflow-y-scroll'>
+                            {donaciones.length>0 &&donaciones[0].idDonacion!=null ?donaciones.map((donacion)=>(
+                                   <>
+                                    
+                                        <div className='px-2 py-3 bg-gray-200 border-b-2 border-green-700'>
+                                            <div className='flex justify-between mb-2'>
+                                                <span className='w-full'>{donacion.nombreDonante}</span><span className='w-full text-right'>{donacion.cantidadDonacion} $</span>
+                                            </div>
+                                            <div className='flex justify-between mb-2'>
+                                                <span>{formatDate(donacion.fechaDonacion)}</span>
+                                            </div>
+                                        </div>
+                                    
+                                    </>
+                                )):<>
+                                    <span>No existen donaciones</span>
+                                </>}
+                            </div>
+                    </div>
+                </Modal>
+
 
                 <Modal id="modalEliminar" showModal={showModalEliminar} setShowModal={setShowModalEliminar}>
                     <div className="py-10 px-10">
@@ -301,8 +345,9 @@ const Proyectos =({proyectos, rows}) => {
                             <td uservalue={formatDatetoSQL(proyecto.fechaProyecto)} className="text-center py-3 border-r-2 border-gray">{formatDate(proyecto.fechaProyecto)}</td>
                             <td uservalue={formatDatetoSQL(proyecto.fechaLimiteProyecto)} className="text-center py-3 border-r-2 border-gray">{formatDate(proyecto.fechaLimiteProyecto)}</td>
                             <td className="text-center py-3 border-r-2 border-gray">
-                                    <button onClick={openModalEditar} className="bg-orange-500 text-white p-2 rounded-lg mr-2 hover:bg-orange-600"><AiFillEdit /></button>
-                                    <button onClick={openModalEliminar} className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"><FiDelete /></button>
+                            <Link href={"donacion/"+proyecto.idProyecto}><button className="bg-green-500 text-white p-1 rounded-lg mr-2 hover:bg-green-600"><MdOutlineAttachMoney /></button></Link>
+                                    <button onClick={openModalEditar} className="bg-orange-500 text-white p-1 rounded-lg mr-2 hover:bg-orange-600"><AiFillEdit /></button>
+                                    <button onClick={openModalEliminar} className="bg-red-500 text-white p-1 rounded-lg hover:bg-red-600"><FiDelete /></button>
                                 </td>
                         </tr>
                         ))}

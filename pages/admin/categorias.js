@@ -13,7 +13,6 @@ import { motion } from "framer-motion"
 
 
 const Categorias =({categorias, rows, rowsS}) => {
-    console.log(rows)
     const [tipoMostrar, setTipoMostrar]= useState('principal')
 
     const mostrarPrincipal = () =>{
@@ -73,7 +72,6 @@ const Categorias =({categorias, rows, rowsS}) => {
     
             }
             refreshData()
-        console.log(formValue)
     }
     
     const handleSubmitEditar = async (e) => {
@@ -91,7 +89,6 @@ const Categorias =({categorias, rows, rowsS}) => {
             }
             setmostrarAvisoFecha(false);
             refreshData()
-        console.log(formValue)
     }
 
     const handleSubmitEliminar = async (e) => {
@@ -187,7 +184,6 @@ const Categorias =({categorias, rows, rowsS}) => {
                 fechaLimite : fechaLimite
             }
         })
-        console.log(formValue)
     }
 
     const pasarDatosEliminar = (e) => {
